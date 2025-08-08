@@ -1,0 +1,179 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useAuth } from "@campnetwork/origin/react";
+import { useBalance } from "wagmi";
+import { parseEther } from "viem";
+import { buttonPrimary, buttonSecondary } from "./styles";
+
+type ConnectSectionProps = {
+  wallet: any;
+  authenticated: boolean;
+  openCampModal: () => void;
+  login: () => void;
+  disconnect: () => void;
+};
+
+export default function ConnectSection({
+  wallet,
+  authenticated,
+  openCampModal,
+  login,
+  disconnect,
+}: ConnectSectionProps) {
+  const auth = useAuth();
+  const router = useRouter();
+
+  const { data: balance, isLoading: isLoadingBalance } = useBalance({
+    address: wallet?.address,
+  });
+
+  const hasEnoughCamp = balance ? balance.value > parseEther("0.01") : false;
+
+  const handleClick = async () => {
+    try {
+      if (wallet?.address) {
+        if (authenticated) {
+          if (!auth.viem) {
+            toast.error("Wallet not connected to Origin", {
+              description: "Please try disconnecting Origin and reconnecting.",
+            });
+            return;
+          }
+          if (!hasEnoughCamp && !isLoadingBalance) {
+            toast.error("Insufficient balance to mint a generation.", {
+              description:
+                "You need at least 0.01 $CAMP in your wallet to mint.",
+            });
+            return;
+          }
+          if (
+            wallet.address.toLowerCase() !==
+            (auth.walletAddress as string)?.toLowerCase()
+          ) {
+            toast.error("Wallet address mismatch", {
+              description:
+                "Connect the same wallet to Origin. Try disconnecting and reconnecting.",
+            });
+            return;
+          }
+          router.push("/explore");
+        } else {
+          openCampModal();
+        }
+      } else {
+        login();
+      }
+    } catch (error) {
+      toast.error("An error occurred", { description: String(error) });
+    }
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ scale: 0.95, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.95, opacity: 0 }}
+      transition={{
+        layout: { duration: 0.5, type: "spring" },
+        scale: { type: "spring", stiffness: 200, damping: 20 },
+        opacity: { duration: 0.3 },
+      }}
+      className="container mx-auto px-4 py-8"
+    >
+      <div className="max-w-md mx-auto bg-cardBg rounded-2xl shadow-lg overflow-hidden">
+        <div className="p-8 text-center">
+          {/* Icon */}
+          <div className="flex justify-center mb-6">
+            <div className="bg-accent/20 p-4 rounded-full">
+              <svg
+                className="h-12 w-12 text-ipv-accent"
+                fill="currentColor"
+                viewBox="0 0 48 48"
+              >
+                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"></path>
+              </svg>
+            </div>
+          </div>
+
+          {/* Heading */}
+          <h2 className="text-3xl font-bold mb-2">
+            {wallet?.address
+              ? authenticated
+                ? "Welcome back!"
+                : "Sign In to IPVerse"
+              : "Sign In to IPVerse"}
+          </h2>
+
+          {/* Subtext */}
+          <p className="text-textSecondary mb-6">
+            {wallet?.address
+              ? authenticated
+                ? "Ready to explore?"
+                : "Connect your wallet to Origin Auth"
+              : "Connect your Web3 wallet to continue."}
+          </p>
+
+          {/* Connect Button */}
+          <button
+            onClick={handleClick}
+            className={`${buttonPrimary} hover:bg-buttonHover text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold`}
+          >
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M22.361,12.253l-3.333-6.13a.5.5,0,0,0-.883.029L16.27,9.789,12.518,2.72a.5.5,0,0,0-.883,0L7.883,9.789,6.008,6.152a.5.5,0,0,0-.883-.029L1.792,12.253a.5.5,0,0,0,.442.747h3.4l2.842,5.228a.5.5,0,0,0,.883,0L12,13.2l2.642,5.028a.5.5,0,0,0,.883,0L18.367,13h3.4a.5.5,0,0,0,.442-.747Z"></path>
+            </svg>
+            {wallet?.address
+              ? authenticated
+                ? "Go to Dashboard"
+                : "Origin Auth"
+              : "Connect Wallet"}
+          </button>
+
+          {/* Disconnect Button */}
+          {wallet?.address && (
+            <button
+              onClick={disconnect}
+              className={`${buttonSecondary} mt-4 bg-transparent w-full border border-textSecondary text-textSecondary py-2 px-4 rounded-lg hover:bg-cardBg transition-colors`}
+            >
+              Disconnect Origin
+            </button>
+          )}
+
+          {/* Balance Warning */}
+          {!hasEnoughCamp && !isLoadingBalance && wallet?.address && (
+            <div className="w-full text-center mt-4">
+              <span className="text-sm text-textSecondary block">
+                You need at least <strong>0.01 $CAMP</strong> in your wallet to
+                mint.
+              </span>
+              <button
+                onClick={() =>
+                  window.open("https://faucet.campnetwork.xyz", "_blank")
+                }
+                className="mt-2 underline hover:text-textPrimary"
+              >
+                Get $CAMP
+              </button>
+            </div>
+          )}
+
+          {/* Terms */}
+          <p className="text-xs text-textSecondary mt-6">
+            By connecting your wallet, you agree to our{" "}
+            <a className="underline hover:text-textPrimary" href="#">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a className="underline hover:text-textPrimary" href="#">
+              Privacy Policy
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
