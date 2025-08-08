@@ -49,11 +49,11 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
   // Authenticated state: render sidebar, navbar, and children
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="flex min-h-screen">
       <Sidebar />
       <div className="flex-1">
         <Navbar />
-        <main className="p-6">{children}</main>
+        {children}
       </div>
     </div>
   );

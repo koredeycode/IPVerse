@@ -34,19 +34,15 @@ const SignInPage = () => {
   }, [wallets]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow flex items-center justify-center">
-        <ConnectSection
-          wallet={wallet}
-          authenticated={authenticated}
-          openCampModal={openModal}
-          login={login}
-          disconnect={disconnect}
-        />
-      </main>
-      <Footer />
-    </div>
+    <main className="flex-grow flex items-center justify-center">
+      <ConnectSection
+        wallet={wallet}
+        authenticated={authenticated}
+        openCampModal={openModal}
+        login={login}
+        disconnect={disconnect}
+      />
+    </main>
   );
 };
 

@@ -1,57 +1,284 @@
 "use client";
 
-import { useAuthState, useConnect, useModal } from "@campnetwork/origin/react";
+import { truncate } from "@/lib/utils";
+import {
+  useAuthState,
+  useConnect,
+  useLinkSocials,
+  useModal,
+  useSocials,
+} from "@campnetwork/origin/react";
 import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
+import { useBalance } from "wagmi";
+import { parseEther, parseGwei } from "viem";
+import { buttonSecondary } from "./styles";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+type SocialLinksStatus = {
+  spotify: boolean;
+  twitter: boolean;
+  tiktok: boolean;
+  // discord: boolean;
+  // telegram: boolean;
+};
+
+export const ConnectedSocials = () => {
+  const { data, error, isLoading } = useSocials();
+
+  const socials = data as SocialLinksStatus;
+
+  console.log("Social:", data);
+
+  const {
+    linkTwitter,
+    unlinkTwitter,
+
+    linkSpotify,
+    unlinkSpotify,
+
+    linkTiktok,
+    unlinkTiktok,
+  } = useLinkSocials();
+
+  if (isLoading || error) {
+    return (
+      <>
+        {isLoading && (
+          <div className="text-sm text-textSecondary">Loading socials…</div>
+        )}
+        {error && (
+          <div className="text-sm text-red-500">Failed to load socials.</div>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {[
+        {
+          name: "Twitter",
+          key: "twitter",
+          link: linkTwitter,
+          unlink: unlinkTwitter,
+        },
+        {
+          name: "Spotify",
+          key: "spotify",
+          link: linkSpotify,
+          unlink: unlinkSpotify,
+        },
+        {
+          name: "TikTok",
+          key: "tiktok",
+          link: linkTiktok,
+          unlink: unlinkTiktok,
+        },
+      ].map(({ name, key, link, unlink }) => {
+        let connected;
+        if (name == "twitter") {
+          connected = socials?.twitter;
+        }
+        if (name == "spotify") {
+          connected = socials?.spotify;
+        }
+        if (name == "tiktok") {
+          connected = socials?.tiktok;
+        }
+
+        return (
+          <div key={key} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {connected ? (
+                <svg
+                  className="text-green-500"
+                  fill="none"
+                  height="20"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              ) : (
+                <svg
+                  className="text-gray-500"
+                  fill="none"
+                  height="20"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" x2="12" y1="8" y2="12"></line>
+                  <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                </svg>
+              )}
+              <span>{name}</span>
+            </div>
+
+            {connected ? (
+              <button
+                onClick={() => unlink()}
+                className="text-xs text-red-500 hover:underline"
+              >
+                Disconnect
+              </button>
+            ) : (
+              <button
+                onClick={() => link()}
+                className="text-xs text-[var(--primary-color)] hover:underline"
+              >
+                Connect
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const Navbar = () => {
   const { logout } = usePrivy();
 
   const { wallet } = useActiveWallet();
+  console.log("Privy Wallet", wallet);
+
   const { openModal: openCampModal } = useModal();
 
   const { connect, disconnect } = useConnect();
   const { authenticated } = useAuthState();
 
+  const { data: balance, isLoading: isLoadingBalance } = useBalance({
+    address: wallet?.address as `0x${string}`,
+  });
+
+  const [search, setSearch] = useState("");
+
+  // const handleSocialToggle = (platform: string, connected: boolean) => {
+  //   if (platform === "twitter") {
+  //     connected ? unlinkTwitter() : linkTwitter();
+  //   } else if (platform === "spotify") {
+  //     connected ? unlinkSpotify() : linkSpotify();
+  //   } else if (platform === "tiktok") {
+  //     connected ? unlinkTiktok() : linkTiktok();
+  //   }
+  // };
+
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between">
-      <h1 className="text-xl font-bold">IPVerse</h1>
-      <div>
-        <span className="mr-4">
-          {wallet?.address?.slice(0, 6)}...{wallet?.address?.slice(-4)}
-        </span>
-        <button onClick={disconnect} className="bg-red-500 px-4 py-2 rounded">
-          Disconnect
-        </button>
-        <button
-          onClick={() => {
-            logout();
-            redirect("/signin");
-          }}
-          className="bg-red-500 px-4 py-2 rounded"
-        >
-          Logout
-        </button>
-      </div>
-      {authenticated && (
-        <>
-          <button
-            onClick={openCampModal}
-            className="bg-black text-white cursor-pointer p-4"
+    <nav className="flex items-center justify-between h-16 border-b border-white/10 p-6">
+      <div className="flex items-center justify-between gap-4 w-full">
+        {/* Search */}
+        <label className="relative flex-1 flex items-center min-w-48 max-w-sm">
+          <div
+            className="absolute left-3 text-textSecondary"
+            data-icon="MagnifyingGlass"
+            data-size="20px"
+            data-weight="regular"
           >
-            Open Modal
-          </button>
-          <button
-            className="bg-black text-white cursor-pointer p-4"
-            onClick={() => {
-              disconnect();
+            <svg
+              fill="currentColor"
+              height="20px"
+              viewBox="0 0 256 256"
+              width="20px"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+            </svg>
+          </div>
+          <input
+            className="form-input w-full rounded-full border-none bg-cardBg h-10 placeholder:text-textSecondary pl-10 pr-4 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-opacity-50"
+            placeholder="Search creators or IPs"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
             }}
-          >
-            Disconnect
-          </button>
-        </>
-      )}
+          />
+        </label>
+
+        {/* Wallet + Dropdown */}
+        <div className="relative group">{/* Dropdown */}</div>
+      </div>
+      {/* ✅ closes .flex.items-center gap-4 */}
+      <Popover>
+        <PopoverTrigger className="sm:flex items-center gap-2 cursor-pointer">
+          {/* <button className="button_primary hidden sm:flex items-center gap-2"> */}
+          <span>{wallet ? truncate(wallet?.address) : "0x00..00"}</span>
+          <img
+            alt="User avatar"
+            className="h-8 w-8 rounded-full"
+            src="https://unavatar.io/x/korefomo"
+          />
+          {/* </button> */}
+        </PopoverTrigger>
+        <PopoverContent className="bg-transparent outline-none border-none right-1">
+          <div className="absolute right-0 w-72 bg-cardBg text-textSecondary border border-[var(--input-border)] rounded-xl shadow-lg p-4">
+            {isLoadingBalance ? (
+              <div className="text-sm text-textSecondary">
+                Loading balance...
+              </div>
+            ) : (
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-textSecondary">Balance</span>
+                <span className="font-bold">
+                  {balance?.formatted.slice(0, 7)} CAMP
+                </span>
+              </div>
+            )}
+
+            <div className="flex flex-col justify-between items-center mb-4">
+              <Link
+                href="https://faucet.campnetwork.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm w-full"
+              >
+                <button
+                  onClick={disconnect}
+                  className={`${buttonSecondary} w-full text-sm`}
+                >
+                  Claim Faucet
+                </button>
+              </Link>
+            </div>
+
+            <div className="border-t border-[var(--input-border)] my-4"></div>
+
+            {/* Socials */}
+            <div>
+              <h3 className="text-sm font-medium mb-3">
+                Origin Connected Accounts
+              </h3>
+              <ConnectedSocials />
+            </div>
+            <div className="border-t border-[var(--input-border)] my-4"></div>
+
+            <button
+              onClick={disconnect}
+              className={`${buttonSecondary} w-full text-sm`}
+            >
+              Disconnect Wallet
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
     </nav>
   );
 };
