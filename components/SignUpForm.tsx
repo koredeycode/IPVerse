@@ -7,22 +7,24 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { buttonPrimary, buttonSecondary, input } from "./styles";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
 
 // Zod schema for validation
 const formSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
   title: z.string().optional(),
   bio: z.string().optional(),
   twitter: z
     .string()
-    .min(1, "Twitter handle is required")
+    .min(3, "Twitter handle is required")
     .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed"),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-const SignUpForm = () => {
+const SignUpForm = ({ wallet }: { wallet: string }) => {
   const [twitterHandle, setTwitterHandle] = useState("");
+
   const router = useRouter();
 
   const {
@@ -33,10 +35,39 @@ const SignUpForm = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     console.log("Form Data:", data);
-    router.push("/explore");
+    try {
+      const { title, bio, twitter } = data;
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, bio, twitter, wallet }),
+      });
+      const user = (await response.json())[0];
+
+      localStorage.setItem("IPVERSE_USER", JSON.stringify(user));
+
+      toast.success("Account created successfully");
+      router.push("/explore");
+    } catch (error) {
+      toast.error("An error occurred", { description: String(error) });
+    }
   };
+
+  if (!wallet) {
+    return (
+      <div className="min-h-screen  flex flex-col items-center justify-center">
+        <p className="text-xl mb-4">You are not logged in</p>
+        <Link
+          href="/signin"
+          className="bg-blue-500 text-white px-6 py-2 rounded"
+        >
+          Go to Sign In
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -55,6 +86,7 @@ const SignUpForm = () => {
         <div className="p-8 md:p-10">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-2">First time on IPVerse?</h2>
+            <h2 className="text-xs font-bold mb-2">{wallet}</h2>
             <p className="text-textSecondary">
               Let's set up your profile. This information will be visible to
               others.
@@ -106,7 +138,7 @@ const SignUpForm = () => {
               )}
             </div>
 
-            <div className="w-full flex flex-col">
+            {/* <div className="w-full flex flex-col">
               <label
                 className="block text-sm font-medium text-textSecondary mb-2"
                 htmlFor="username"
@@ -129,7 +161,7 @@ const SignUpForm = () => {
                   {errors.username.message}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div className="w-full flex flex-col">
               <label

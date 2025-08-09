@@ -9,11 +9,12 @@ import {
   typographyH1,
   typographyH2,
 } from "@/components/styles";
-import { getFileIcon, getTotalSeconds } from "@/lib/content";
+import { getFileIcon, getFileType, getTotalSeconds } from "@/lib/content";
 import { uploadSchema, mintSchema } from "@/schemas/contentSchemas";
 import { useAuth } from "@campnetwork/origin/react";
 import { useState } from "react";
 import type { Address } from "viem/accounts";
+import { useActiveWallet } from "@privy-io/react-auth";
 
 type MetadataAttribute = {
   trait_type: string;
@@ -31,18 +32,24 @@ export default function Create() {
   const auth = useAuth();
 
   const { origin } = auth;
+  const { wallet } = useActiveWallet();
 
   const [file, setFile] = useState<File | null>(null);
   const [mintFile, setMintFile] = useState<File | null>(null);
 
   const [stepOneComplete, setStepOneComplete] = useState(false);
+  const [stepTwoComplete, setStepTwoComplete] = useState(false);
+
   const [showFileCard, setShowFileCard] = useState(false);
+
+  const [contentId, setContentId] = useState<any>();
 
   const [mintData, setMintData] = useState({
     title: "",
-    url: "",
+    fileUrl: "",
+    imageUrl: "",
     description: "",
-    metadata: [
+    attributes: [
       { trait_type: "Example trait", value: "Example value" },
     ] as MetadataAttribute[],
     price: "",
@@ -50,14 +57,14 @@ export default function Create() {
     durationUnit: "Weeks",
   });
 
-  async function handleUploadSubmit() {
+  async function handleUploadFile() {
     if (!file) {
-      alert("no file");
+      toast.error("No file uploaded");
       return;
     }
     const result = uploadSchema.safeParse({ file });
     if (!result.success) {
-      alert(result.error.errors[0].message);
+      toast.error(result.error.errors[0].message);
       return;
     }
 
@@ -65,76 +72,173 @@ export default function Create() {
       type: file.type,
     });
 
-    console.log(ipfsFile);
-    let url = "";
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("file", ipfsFile);
+    let fileUrl = "";
+    try {
+      const formData = new FormData();
+      formData.append("file", ipfsFile);
 
-    //   const response = await fetch(
-    //     "https://api.pinata.cloud/pinning/pinFileToIPFS",
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
-    //       },
-    //       body: formData,
-    //     }
-    //   );
+      const response = await fetch(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
+          },
+          body: formData,
+        }
+      );
 
-    //   const result = await response.json();
-    //   url = `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`;
+      const result = await response.json();
+      fileUrl = result.IpfsHash
+        ? `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`
+        : ``;
 
-    //   console.log(`url: ${url}`);
+      if (!fileUrl) {
+        throw new Error("Failed to get IPFS URL after upload");
+      }
 
-    //   if (!url) {
-    //     throw new Error("Failed to get IPFS URL after upload");
-    //   }
+      toast.success("File uploaded to IPFS successfully!", {
+        description: `IPFS URL: ${fileUrl}`,
+      });
 
-    //   toast.success("File uploaded to IPFS successfully!", {
-    //     description: `IPFS URL: ${url}`,
-    //   });
-    // } catch (error) {
-    //   console.error("IPFS upload error:", error);
-    //   toast.error("Failed to upload file to IPFS", {
-    //     description:
-    //       "There was an error uploading your file. Please try again.",
-    //     duration: 5000,
-    //   });
-    //   return;
-    // }
+      //send data to ipverse
+      const APIResponse = await fetch("/api/contents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileUrl,
+          creator: wallet?.address,
+          type: getFileType(file.name),
+        }),
+      });
+
+      const { $id: id } = await APIResponse.json();
+
+      setContentId(id);
+
+      toast.success("Uploaded to ipVerse successfully");
+    } catch (error) {
+      console.error("IPFS upload error:", error);
+      toast.error("Failed to upload file to IPFS", {
+        description:
+          "There was an error uploading your file. Please try again.",
+        duration: 5000,
+      });
+      return;
+    }
 
     // Auto-fill URL (in a real app this comes from your upload API)
     setMintData((prev) => ({
       ...prev,
-      url,
+      fileUrl,
     }));
     setStepOneComplete(true);
   }
-
-  async function handleMintSubmit() {
-    const result = mintSchema.safeParse({
-      ...mintData,
-      price: Number(mintData.price),
-      duration: Number(mintData.duration),
-    });
-    if (!result.success) {
-      alert(result.error.errors[0].message);
+  async function handleUploadImage() {
+    if (!stepOneComplete) {
+      toast.error("Upload file first");
+      return;
+    }
+    if (!mintFile) {
+      toast.error("No file uploaded");
       return;
     }
 
+    console.log(mintFile);
+    // const result = uploadSchema.safeParse({ mintFile });
+    // if (!result.success) {
+    //   console.log("schemoo");
+    //   toast.error(result.error.errors[0].message);
+    //   return;
+    // }
+
+    const ipfsFile = new File([mintFile], mintFile.name, {
+      type: mintFile.type,
+    });
+
+    let imageUrl = "";
+    try {
+      const formData = new FormData();
+      formData.append("file", ipfsFile);
+
+      const response = await fetch(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+      imageUrl = result.IpfsHash
+        ? `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`
+        : ``;
+
+      if (!imageUrl) {
+        throw new Error("Failed to get IPFS URL after upload");
+      }
+      console.log(imageUrl);
+
+      toast.success("File uploaded to IPFS successfully!", {
+        description: `IPFS URL: ${imageUrl}`,
+      });
+
+      //update data to ipverse
+      const APIResponse = await fetch(`/api/contents/${contentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageUrl,
+        }),
+      });
+
+      toast.success("Ipverse content updated successfully");
+    } catch (error) {
+      console.error("IPFS upload error:", error);
+      toast.error("Failed to upload file to IPFS", {
+        description:
+          "There was an error uploading your file. Please try again.",
+        duration: 5000,
+      });
+      return;
+    }
+
+    // Auto-fill URL (in a real app this comes from your upload API)
+    setMintData((prev) => ({
+      ...prev,
+      imageUrl,
+    }));
+    setStepTwoComplete(true);
+  }
+
+  async function handleMintSubmit() {
+    console.log("let's mint");
+    // const result = mintSchema.safeParse({
+    //   ...mintData,
+    //   price: Number(mintData.price),
+    //   duration: Number(mintData.duration),
+    // });
+
+    // if (!result.success) {
+    //   toast.error(result.error.errors[0].message);
+    //   return;
+    // }
+
     if (!mintFile) {
-      alert("no file");
+      toast.error("No mintable file detected");
       return;
     }
 
     if (!origin) {
-      alert("user not connected to origin");
+      toast.error("user not connected to origin");
       return;
     }
 
     const license = {
-      price: BigInt(mintData.price),
+      price: BigInt(Number(mintData.price) * 10 ** 18),
       duration: getTotalSeconds(
         Number(mintData.duration),
         mintData.durationUnit
@@ -144,18 +248,31 @@ export default function Create() {
     } as LicenseTerms;
 
     const metadata = {
+      title: "An IPVerse IP",
       name: mintData.title,
       description: mintData.description,
-      image: mintData.url,
-      attributes: mintData.metadata,
+      image: mintData.imageUrl,
+      file: mintData.fileUrl,
+      attributes: mintData.attributes,
     };
 
     try {
-      await origin.mintFile(mintFile, metadata, license);
+      const tokenId = await origin.mintFile(mintFile, metadata, license);
+
+      // 62969147512708210739597738314450365440119337125482253728267133656897450032217
 
       toast.success(`Minting successful! Your IP NFT is now live.`, {
         duration: 5000,
       });
+      //update data to ipverse
+      const APIResponse = await fetch(`/api/contents/${contentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tokenId,
+        }),
+      });
+      toast.success("Ipverse content updated successfully");
     } catch (error) {
       console.error("Minting failed:", error);
 
@@ -197,7 +314,7 @@ export default function Create() {
   function addMetadataField() {
     setMintData((prev) => ({
       ...prev,
-      metadata: [...prev.metadata, { trait_type: "", value: "" }],
+      attributes: [...prev.attributes, { trait_type: "", value: "" }],
     }));
   }
 
@@ -207,7 +324,7 @@ export default function Create() {
     value: string
   ) {
     setMintData((prev) => {
-      const newMetadata = [...prev.metadata];
+      const newMetadata = [...prev.attributes];
       newMetadata[index][key] = value;
       return { ...prev, metadata: newMetadata };
     });
@@ -215,7 +332,7 @@ export default function Create() {
 
   function removeMetadataField(index: number) {
     setMintData((prev) => {
-      const newMetadata = prev.metadata.filter((_, i) => i !== index);
+      const newMetadata = prev.attributes.filter((_, i) => i !== index);
       return { ...prev, metadata: newMetadata };
     });
   }
@@ -229,7 +346,7 @@ export default function Create() {
       {/* Step 1: Upload */}
       <div className="card">
         <h2 className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6"`}>
-          1. Upload
+          1. Upload File
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -255,19 +372,19 @@ export default function Create() {
                     <path
                       d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4H7z"
                       strokeLinecap="round"
-                      stroke-linejoin="round"
+                      strokeLinejoin="round"
                       stroke-width="2"
                     ></path>
                     <path
                       d="M12 16v-4m0 0l-2-2m2 2l2-2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                     ></path>
                   </svg>
                   <p className="mb-2 text-sm text-textSecondary">
-                    <span className="font-semibold">Click to upload</span> or
-                    drag and drop
+                    <span className="font-semibold">Click to upload</span>
+                    {/* or drag and drop */}
                   </p>
                   <p className="text-xs text-textSecondary">
                     Supported: JPG, PNG, GIF, MP4, MP3, etc.
@@ -285,9 +402,9 @@ export default function Create() {
             </div>
             <button
               className={`${buttonPrimary} w-full mt-4`}
-              onClick={handleUploadSubmit}
+              onClick={handleUploadFile}
             >
-              Upload and Continue
+              Upload File
             </button>
           </div>
           <div className="bg-ipv-background rounded-lg p-2">
@@ -299,7 +416,7 @@ export default function Create() {
       {/* Step 2: Mint */}
       <div className={`card ${!stepOneComplete ? "opacity-50" : ""}`}>
         <h2 className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6`}>
-          2. Mint
+          2. Metadata
         </h2>
         <div className="space-y-6">
           {/* Info */}
@@ -308,7 +425,7 @@ export default function Create() {
               Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              <div className="md:col-span-2">
                 <label
                   className="block text-sm font-medium text-text-primary mb-2"
                   htmlFor="title"
@@ -332,7 +449,7 @@ export default function Create() {
                   className="block text-sm font-medium text-text-primary mb-2"
                   htmlFor="url"
                 >
-                  URL
+                  fileURL
                 </label>
 
                 <input
@@ -340,7 +457,24 @@ export default function Create() {
                   id="url"
                   placeholder="Auto-filled URL"
                   type="text"
-                  value={mintData.url}
+                  value={mintData.fileUrl}
+                  readOnly
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-text-primary mb-2"
+                  htmlFor="url"
+                >
+                  imageURL
+                </label>
+
+                <input
+                  className="input w-full bg-gray-700 cursor-not-allowed"
+                  id="url"
+                  placeholder="Auto-filled URL"
+                  type="text"
+                  value={mintData.imageUrl}
                   readOnly
                 />
               </div>
@@ -369,10 +503,10 @@ export default function Create() {
           {/* Metadata */}
           <div>
             <h3 className="text-xl font-semibold mb-4 text-textPrimary">
-              Metadata
+              Attributes
             </h3>
             <div className="space-y-4" id="metadata-fields">
-              {mintData.metadata.map((attr, i) => (
+              {mintData.attributes.map((attr, i) => (
                 <div key={i} className="flex items-end gap-4 mb-2">
                   <div className="flex-1">
                     <label
@@ -410,7 +544,7 @@ export default function Create() {
                       }
                     />
                   </div>
-                  {i < mintData.metadata.length - 1 ? (
+                  {i < mintData.attributes.length - 1 ? (
                     <button
                       className={`${buttonSecondary} p-2`}
                       onClick={() => removeMetadataField(i)}
@@ -432,9 +566,9 @@ export default function Create() {
                       >
                         <path
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                         ></path>
                       </svg>
                     </button>
@@ -508,8 +642,7 @@ export default function Create() {
             <FileCard
               title={mintData.title}
               fileTypeIcon={getFileIcon(file.type || "")}
-              creator="@korefomo"
-              qrValue="https://ipverse.app/item/12345"
+              contentId={contentId}
               onImageGenerated={(file) => setMintFile(file)}
             />
           )}
@@ -520,14 +653,23 @@ export default function Create() {
               onClick={() => {
                 setShowFileCard(true);
               }}
-              disabled={!stepOneComplete}
+              disabled={!mintData.title}
             >
               Generate IpNFT
             </button>
             <button
               className={`${buttonPrimary} w-full md:w-auto`}
+              onClick={handleUploadImage}
+              disabled={!stepOneComplete || !mintFile}
+            >
+              Upload IpNFT
+            </button>
+          </div>
+          <div>
+            <button
+              className={`${buttonPrimary} w-full md:w-auto`}
               onClick={handleMintSubmit}
-              disabled={!stepOneComplete}
+              disabled={!stepTwoComplete}
             >
               Mint IP
             </button>

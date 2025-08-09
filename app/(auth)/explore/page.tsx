@@ -56,7 +56,7 @@ export const GalleryItem = ({
     <div className="flex flex-col gap-3 group">
       <Link
         className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg overflow-hidden relative"
-        href="#"
+        href="/content?tokenUri=1"
         style={{
           backgroundImage: `url('${image_url}')`,
         }}
@@ -77,10 +77,8 @@ export const GalleryItem = ({
       </Link>
       <div>
         <h3 className="font-semibold truncate">{title}</h3>
-        <p className="text-[var(--text-secondary)] text-sm">by @{creator}</p>
-        <p className="text-[var(--text-secondary)] text-sm mt-1">
-          {description}
-        </p>
+        <p className="text-textSecondary text-sm">by @{creator}</p>
+        <p className="text-textSecondary text-sm mt-1">{description}</p>
       </div>
     </div>
   );
@@ -153,7 +151,7 @@ export const NavButton = ({
   return (
     <Link
       // flex size-10 items-center justify-center rounded-full bg-[var(--accent-color)] text-sm font-bold text-white
-      // flex size-10 items-center justify-center rounded-full text-sm text-[var(--text-secondary)] hover:bg-[var(--card-background)] hover:text-white transition-colors
+      // flex size-10 items-center justify-center rounded-full text-sm text-textSecondary hover:bg-[var(--card-background)] hover:text-white transition-colors
       className={`flex size-10 items-center justify-center rounded-full text-sm ${
         isActive
           ? "bg-ipv-accent text-white font-bold"
@@ -191,7 +189,7 @@ const Explore = () => {
       </div>
       <div className="flex items-center justify-center mt-8">
         <a
-          className="flex size-10 items-center justify-center text-[var(--text-secondary)] hover:text-white transition-colors"
+          className="flex size-10 items-center justify-center text-textSecondary hover:text-white transition-colors"
           href="#"
         >
           <div data-icon="CaretLeft" data-size="20px" data-weight="regular">
@@ -210,7 +208,7 @@ const Explore = () => {
           <NavButton key={idx} page={page} isActive={idx + 1 == 1} />
         ))}
         <a
-          className="flex size-10 items-center justify-center text-[var(--text-secondary)] hover:text-white transition-colors"
+          className="flex size-10 items-center justify-center text-textSecondary hover:text-white transition-colors"
           href="#"
         >
           <div data-icon="CaretRight" data-size="20px" data-weight="regular">

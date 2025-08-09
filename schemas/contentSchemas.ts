@@ -11,7 +11,6 @@ export const mintSchema = z.object({
   title: z.string().min(1, "Title is required"),
   url: z.string().url("Invalid URL"),
   description: z.string().min(1, "Description is required"),
-  tags: z.string().optional(),
   metadata: z.array(
     z.object({
       traitType: z.string().min(1),

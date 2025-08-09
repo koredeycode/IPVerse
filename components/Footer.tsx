@@ -22,7 +22,7 @@ const Footer = () => {
             </Link>
           </div>
           <p className={`${typographyBody} text-center md:text-right`}>
-            © 2024 IPVerse. All rights reserved.
+            © 2025 IPVerse. All rights reserved.
           </p>
           <p className={`${typographyBody} text-center md:text-right`}>
             Powered by camp network

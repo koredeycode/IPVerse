@@ -143,7 +143,7 @@ export const ConnectedSocials = () => {
             ) : (
               <button
                 onClick={() => link()}
-                className="text-xs text-[var(--primary-color)] hover:underline"
+                className="text-xs text-ipv-primary hover:underline"
               >
                 Connect
               </button>
@@ -204,7 +204,7 @@ const Navbar = () => {
             </svg>
           </div>
           <input
-            className="form-input w-full rounded-full border-none bg-cardBg h-10 placeholder:text-textSecondary pl-10 pr-4 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-opacity-50"
+            className="form-input w-full rounded-full border-none bg-cardBg h-10 placeholder:text-textSecondary pl-10 pr-4 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-ipv-primarytext-ipv-primary focus:ring-opacity-50"
             placeholder="Search creators or IPs"
             value={search}
             onChange={(e) => {

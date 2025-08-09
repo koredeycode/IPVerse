@@ -6,6 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { useAuthState } from "@campnetwork/origin/react";
 import { usePrivy } from "@privy-io/react-auth";
+import Link from "next/link";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -40,9 +41,12 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
         <p className="text-xl mb-4">You are not logged in</p>
-        <a href="/signin" className="bg-blue-500 text-white px-6 py-2 rounded">
+        <Link
+          href="/signin"
+          className="bg-blue-500 text-white px-6 py-2 rounded"
+        >
           Go to Sign In
-        </a>
+        </Link>
       </div>
     );
   }

@@ -7,12 +7,16 @@ import {
   getFileIcon,
 } from "@/lib/content";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface ContentPreviewProps {
   file: File | null;
 }
 
 const ContentPreview = ({ file }: ContentPreviewProps) => {
+  const [isRenderedView, setIsRenderedView] = useState<boolean>(true);
+  const [content, setContent] = useState<string>("");
+
   if (!file) {
     return <p>❓ Preview not available</p>;
   }
@@ -31,13 +35,41 @@ const ContentPreview = ({ file }: ContentPreviewProps) => {
   }
 
   if (ALLOWED_TEXT.includes(type)) {
-    const [content, setContent] = useState<string>("");
+    const isMarkdown = type === "text/markdown" || file.name.endsWith(".md");
 
     file.text().then(setContent);
 
+    if (isMarkdown) {
+      return (
+        <div className="relative flex flex-col">
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={() => setIsRenderedView(!isRenderedView)}
+              className="px-3 py-1 text-sm bg-cardBg text-textPrimary rounded hover:bg-textSecondary/20 transition"
+            >
+              {isRenderedView ? "Show Source" : "Show Rendered"}
+            </button>
+          </div>
+          {isRenderedView ? (
+            <div className="flex justify-center">
+              <div className="prose prose-invert bg-gray-100 rounded text-black p-4 max-w-160 max-h-160 overflow-auto">
+                <ReactMarkdown>{content}</ReactMarkdown>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <pre className="bg-gray-100 text-black p-4 rounded max-w-160 max-h-160 overflow-auto text-sm">
+                {content}
+              </pre>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div>
-        <pre className="bg-gray-100 text-black p-2 rounded max-h-80 overflow-auto text-sm">
+        <pre className="bg-gray-100 text-black p-4 rounded max-h-80 overflow-auto text-sm">
           {content}
         </pre>
       </div>

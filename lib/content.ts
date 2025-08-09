@@ -53,6 +53,34 @@ export const getFileIcon = (fileName: string) => {
   }
 };
 
+export const getFileType = (fileName: string) => {
+  const extension = fileName.split(".").pop()?.toLowerCase();
+
+  switch (extension) {
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "gif":
+    case "webp":
+      return "image";
+    case "txt":
+    case "md":
+    case "json":
+      return "text";
+    case "mp3":
+    case "wav":
+    case "m4a":
+    case "aac":
+      return "audio";
+    case "mp4":
+    case "mov":
+    case "avi":
+      return "video";
+    default:
+      return "others";
+  }
+};
+
 export const getTotalSeconds = (duration: number, unit: string): number => {
   const secondsIn = {
     Days: 24 * 60 * 60,

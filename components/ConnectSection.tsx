@@ -31,6 +31,11 @@ export default function ConnectSection({
   });
 
   const hasEnoughCamp = balance ? balance.value > parseEther("0.01") : false;
+  const getUserInfo = async () => {
+    const response = await fetch(`/api/users?wallet=${wallet?.address}`);
+    const data = await response.json();
+    return data;
+  };
 
   const handleClick = async () => {
     try {
@@ -59,7 +64,14 @@ export default function ConnectSection({
             });
             return;
           }
-          router.push("/explore");
+          const user = (await getUserInfo())[0];
+
+          if (user) {
+            localStorage.setItem("IPVERSE_USER", JSON.stringify(user));
+            router.push("/explore");
+          } else {
+            router.push("/signup");
+          }
         } else {
           openCampModal();
         }
@@ -127,13 +139,13 @@ export default function ConnectSection({
             </svg>
             {wallet?.address
               ? authenticated
-                ? "Go to Dashboard"
+                ? "Enter the IPVerse"
                 : "Origin Auth"
               : "Connect Wallet"}
           </button>
 
           {/* Disconnect Button */}
-          {wallet?.address && (
+          {wallet?.address && authenticated && (
             <button
               onClick={disconnect}
               className={`${buttonSecondary} mt-4 bg-transparent w-full border border-textSecondary text-textSecondary py-2 px-4 rounded-lg hover:bg-cardBg transition-colors`}

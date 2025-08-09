@@ -5,19 +5,27 @@ import { QRCodeSVG } from "qrcode.react";
 type FileCardProps = {
   title: string;
   fileTypeIcon: string;
-  creator: string;
-  qrValue: string;
+
+  contentId: string;
   onImageGenerated: (file: File) => void; // Send File object to parent
 };
 
 export default function FileCard({
   title,
   fileTypeIcon,
-  creator,
-  qrValue,
+
+  contentId,
   onImageGenerated,
 }: FileCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+
+  let creator = "@";
+
+  const storedUser = localStorage.getItem("IPVERSE_USER");
+  if (storedUser) {
+    const parsedUser = JSON.parse(storedUser);
+    creator = `@${parsedUser.twitter ?? ""}`;
+  }
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -35,7 +43,7 @@ export default function FileCard({
         }
       }, "image/png");
     });
-  }, [title, fileTypeIcon, creator, qrValue]);
+  }, [title, fileTypeIcon, contentId]);
 
   return (
     <div
@@ -71,7 +79,10 @@ export default function FileCard({
       {/* Footer: QR Code */}
       <div className="flex justify-center gap-2 items-end">
         <p className="text-base text-gray-500 mt-2">By {creator}</p>
-        <QRCodeSVG value={qrValue} size={64} />
+        <QRCodeSVG
+          value={`http://localhost:3000/content/${contentId}`}
+          size={64}
+        />
       </div>
     </div>
   );
