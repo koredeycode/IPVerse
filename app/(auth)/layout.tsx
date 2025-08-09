@@ -1,9 +1,3 @@
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
-
-import { redirect } from "next/navigation";
-import { useAuthState, useConnect, useModal } from "@campnetwork/origin/react";
-import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
 import AuthLayout from "@/components/AuthLayout";
 
 export default async function Layout({

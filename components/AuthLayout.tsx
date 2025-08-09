@@ -53,7 +53,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <Sidebar />
       <div className="flex-1">
         <Navbar />
-        {children}
+        <main className="flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>
   );
