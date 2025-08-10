@@ -1,5 +1,3 @@
-import React from "react";
-
 const HeroSection = () => {
   return (
     <section className="text-center py-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white">

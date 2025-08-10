@@ -1,6 +1,5 @@
-import React from "react";
-import SearchBar from "./SearchBar";
 import ContentCard from "./ContentCard";
+import SearchBar from "./SearchBar";
 
 const ExploreContent = () => {
   return (

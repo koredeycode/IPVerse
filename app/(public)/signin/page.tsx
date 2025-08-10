@@ -1,13 +1,10 @@
 "use client";
 
 import ConnectSection from "@/components/ConnectSection";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import { buttonPrimary } from "@/components/styles";
 import { useAuthState, useConnect, useModal } from "@campnetwork/origin/react";
 import { useActiveWallet, usePrivy, useWallets } from "@privy-io/react-auth";
 import { useSetActiveWallet } from "@privy-io/wagmi";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 const SignInPage = () => {
   const {

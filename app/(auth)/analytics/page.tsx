@@ -2,8 +2,6 @@
 import { useAuth } from "@campnetwork/origin/react";
 import { useEffect } from "react";
 
-import React from "react";
-
 const Analytics = () => {
   const auth = useAuth();
   console.log("analytics");

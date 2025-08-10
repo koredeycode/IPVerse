@@ -1,6 +1,5 @@
 "use client";
 
-import { toast } from "sonner";
 import ContentPreview from "@/components/ContentPreview";
 import FileCard from "@/components/FileCard";
 import {
@@ -10,11 +9,12 @@ import {
   typographyH2,
 } from "@/components/styles";
 import { getFileIcon, getFileType, getTotalSeconds } from "@/lib/content";
-import { uploadSchema, mintSchema } from "@/schemas/contentSchemas";
+import { uploadSchema } from "@/schemas/contentSchemas";
 import { useAuth } from "@campnetwork/origin/react";
-import { useState } from "react";
-import type { Address } from "viem/accounts";
 import { useActiveWallet } from "@privy-io/react-auth";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { Address } from "viem/accounts";
 
 type MetadataAttribute = {
   trait_type: string;

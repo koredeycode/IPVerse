@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import ContentPreview from "./ContentPreview";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { typographyBody, typographyH1, typographyH2 } from "./styles";
+import ContentPreview from "./ContentPreview";
+import { typographyH2 } from "./styles";
 
 interface MetadataAttribute {
   trait_type: string;

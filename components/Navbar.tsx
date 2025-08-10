@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { getLoggedInUserTwitter, truncate } from "@/lib/utils";
 import {
   useAuthState,
@@ -10,16 +15,10 @@ import {
 } from "@campnetwork/origin/react";
 import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useBalance } from "wagmi";
-import { parseEther, parseGwei } from "viem";
 import { buttonSecondary } from "./styles";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 type SocialLinksStatus = {
   spotify: boolean;

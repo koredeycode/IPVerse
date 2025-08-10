@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { useAuth } from "@campnetwork/origin/react";
-import { useBalance } from "wagmi";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { parseEther } from "viem";
-import { buttonPrimary, buttonSecondary } from "./styles";
+import { useBalance } from "wagmi";
+import { buttonPrimary } from "./styles";
 
 type ConnectSectionProps = {
   wallet: any;

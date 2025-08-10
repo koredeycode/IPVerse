@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
 import html2canvas from "html2canvas-pro";
 import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useRef } from "react";
 
 type FileCardProps = {
   title: string;

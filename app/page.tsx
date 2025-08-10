@@ -2,13 +2,11 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import {
   buttonPrimary,
-  buttonSecondary,
   typographyBody,
   typographyH1,
   typographyH2,
 } from "@/components/styles";
 import Link from "next/link";
-import React from "react";
 
 const Home = () => {
   return (

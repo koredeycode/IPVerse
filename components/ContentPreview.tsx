@@ -4,7 +4,6 @@ import {
   ALLOWED_IMAGE,
   ALLOWED_TEXT,
   ALLOWED_VIDEO,
-  getFileIcon,
 } from "@/lib/content";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";

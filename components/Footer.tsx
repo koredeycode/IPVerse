@@ -1,6 +1,5 @@
-import React from "react";
-import { typographyBody, typographyH1 } from "./styles";
 import Link from "next/link";
+import { typographyBody } from "./styles";
 
 const Footer = () => {
   return (

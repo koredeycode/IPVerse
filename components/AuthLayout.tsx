@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 import { useAuthState } from "@campnetwork/origin/react";
 import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 interface AuthLayoutProps {
   children: React.ReactNode;

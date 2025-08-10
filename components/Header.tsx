@@ -1,6 +1,3 @@
-import React from "react";
-import { buttonPrimary } from "./styles";
-
 const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-ipv-background/80 backdrop-blur-sm">

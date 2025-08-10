@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
 import ContentView from "@/components/ContentView";
-import { toast } from "sonner";
 import NoContentView from "@/components/NoContentView";
 import { useAuth } from "@campnetwork/origin/react";
-import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
-import type { Address } from "viem/accounts";
+import { useActiveWallet } from "@privy-io/react-auth";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { isAddress } from "viem";
 
 interface MetadataAttribute {

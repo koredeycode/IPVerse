@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  contentCollectionId,
-  databaseId,
-  databases,
-  ID,
-  userCollectionId,
-} from "@/lib/appwrite";
+import { contentCollectionId, databaseId, databases, ID } from "@/lib/appwrite";
 import { Query } from "node-appwrite";
 
 export async function POST(request: Request) {

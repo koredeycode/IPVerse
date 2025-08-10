@@ -1,9 +1,4 @@
-import ContentCard from "@/components/ContentCard";
-
-import ExploreContent from "@/components/Explore";
-import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
-import React from "react";
 
 const fileTypes = [
   { label: "All", value: "all" },
@@ -13,7 +8,7 @@ const fileTypes = [
   { label: "Text", value: "text" },
 ];
 
-export const FilterButton = ({
+const FilterButton = ({
   label,
   isActive = false,
 }: {
@@ -44,12 +39,7 @@ type MediaItem = {
   // href: string;
 };
 
-export const GalleryItem = ({
-  title,
-  creator,
-  description,
-  image_url,
-}: MediaItem) => {
+const GalleryItem = ({ title, creator, description, image_url }: MediaItem) => {
   console.log("galllery");
   console.log(image_url);
   return (

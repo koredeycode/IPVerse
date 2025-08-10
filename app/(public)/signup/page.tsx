@@ -1,6 +1,5 @@
 "use client";
 import SignUpForm from "@/components/SignUpForm";
-import React from "react";
 import { useActiveWallet } from "@privy-io/react-auth";
 
 const SignUpPage = () => {

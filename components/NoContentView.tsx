@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { buttonPrimary } from "./styles";
-import { useAuth } from "@campnetwork/origin/react";
 import { fromTotalSeconds } from "@/lib/content";
-import { Address } from "viem";
+import { useAuth } from "@campnetwork/origin/react";
 import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { Address } from "viem";
+import { buttonPrimary } from "./styles";
 
 interface MetadataAttribute {
   trait_type: string;

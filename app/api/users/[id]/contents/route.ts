@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { contentCollectionId, databaseId, databases } from "@/lib/appwrite";
+import { NextResponse } from "next/server";
 import { Query } from "node-appwrite";
 
 export async function GET(

@@ -1,14 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { buttonPrimary, buttonSecondary, input } from "./styles";
-import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+import { buttonPrimary, input } from "./styles";
 
 // Zod schema for validation
 const formSchema = z.object({

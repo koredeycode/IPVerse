@@ -1,6 +1,5 @@
-import React from "react";
-import SidebarNavLink from "./SidebarNavLink";
 import { getLoggedInUserTwitter } from "@/lib/utils";
+import SidebarNavLink from "./SidebarNavLink";
 
 const Sidebar = () => {
   return (
