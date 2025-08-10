@@ -23,10 +23,10 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { tokenId, fileUrl, imageUrl, type } = await request.json();
     const content = await databases.getDocument(
       databaseId,

@@ -9,6 +9,7 @@ import {
   typographyH2,
 } from "@/components/styles";
 import { getFileIcon, getFileType, getTotalSeconds } from "@/lib/content";
+import { getLoggedInUserTwitter } from "@/lib/utils";
 import { uploadSchema } from "@/schemas/contentSchemas";
 import { useAuth } from "@campnetwork/origin/react";
 import { useActiveWallet } from "@privy-io/react-auth";
@@ -47,7 +48,7 @@ export default function Create() {
 
   const [mintData, setMintData] = useState({
     title: "",
-    fileUrl: "",
+    // fileUrl: "",
     imageUrl: "",
     description: "",
     attributes: [
@@ -58,91 +59,7 @@ export default function Create() {
     durationUnit: "Weeks",
   });
 
-  async function handleUploadFile() {
-    if (!file) {
-      toast.error("No file uploaded");
-      return;
-    }
-    const result = uploadSchema.safeParse({ file });
-    if (!result.success) {
-      toast.error(result.error.errors[0].message);
-      return;
-    }
-
-    const ipfsFile = new File([file], file.name, {
-      type: file.type,
-    });
-
-    let fileUrl = "";
-    try {
-      setLoadingState("fileUploading");
-      const formData = new FormData();
-      formData.append("file", ipfsFile);
-
-      const response = await fetch(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
-          },
-          body: formData,
-        }
-      );
-
-      const result = await response.json();
-      fileUrl = result.IpfsHash
-        ? `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`
-        : ``;
-
-      if (!fileUrl) {
-        throw new Error("Failed to get IPFS URL after upload");
-      }
-
-      toast.success("File uploaded to IPFS successfully!", {
-        description: `IPFS URL: ${fileUrl}`,
-      });
-
-      //send data to ipverse
-      const APIResponse = await fetch("/api/contents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileUrl,
-          creator: wallet?.address,
-          type: getFileType(file.name),
-        }),
-      });
-
-      const { $id: id } = await APIResponse.json();
-
-      setContentId(id);
-
-      toast.success("Uploaded to ipVerse successfully");
-    } catch (error) {
-      console.error("IPFS upload error:", error);
-      toast.error("Failed to upload file to IPFS", {
-        description:
-          "There was an error uploading your file. Please try again.",
-        duration: 5000,
-      });
-      return;
-    } finally {
-      setLoadingState("none");
-    }
-
-    // Auto-fill URL (in a real app this comes from your upload API)
-    setMintData((prev) => ({
-      ...prev,
-      fileUrl,
-    }));
-    setStepOneComplete(true);
-  }
   async function handleUploadImage() {
-    if (!stepOneComplete) {
-      toast.error("Upload file first");
-      return;
-    }
     if (!mintFile) {
       toast.error("No file uploaded");
       return;
@@ -191,16 +108,20 @@ export default function Create() {
         description: `IPFS URL: ${imageUrl}`,
       });
 
-      //update data to ipverse
-      const APIResponse = await fetch(`/api/contents/${contentId}`, {
-        method: "PATCH",
+      const APIResponse = await fetch("/api/contents", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageUrl,
         }),
       });
 
-      toast.success("Ipverse content updated successfully");
+      const { $id: id } = await APIResponse.json();
+
+      setContentId(id);
+      setStepOneComplete(true);
+
+      toast.success("Uploaded to ipVerse successfully");
     } catch (error) {
       console.error("IPFS upload error:", error);
       toast.error("Failed to upload file to IPFS", {
@@ -218,11 +139,13 @@ export default function Create() {
       ...prev,
       imageUrl,
     }));
-    setStepTwoComplete(true);
   }
 
   async function handleMintSubmit() {
-    console.log("let's mint");
+    if (!stepOneComplete) {
+      toast.error("Upload nft image file first");
+      return;
+    }
     // const result = mintSchema.safeParse({
     //   ...mintData,
     //   price: Number(mintData.price),
@@ -259,10 +182,10 @@ export default function Create() {
       name: mintData.title,
       description: mintData.description,
       image: mintData.imageUrl,
-      file: mintData.fileUrl,
+      // file: mintData.fileUrl,
       attributes: mintData.attributes,
       // date
-      //creator
+      creator: getLoggedInUserTwitter() || "@ipVerse",
     };
 
     try {
@@ -276,14 +199,19 @@ export default function Create() {
         duration: 5000,
       });
       //update data to ipverse
+
       const APIResponse = await fetch(`/api/contents/${contentId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tokenId,
+          title: mintData.title,
+          description: mintData.description,
+          creator: getLoggedInUserTwitter() || "@ipVerse",
         }),
       });
       toast.success("Ipverse content updated successfully");
+      setStepTwoComplete(true);
     } catch (error) {
       console.error("Minting failed:", error);
 
@@ -324,6 +252,84 @@ export default function Create() {
     }
   }
 
+  async function handleUploadFile() {
+    if (!stepTwoComplete) {
+      toast.error("Upload nft image file first and mint first");
+      return;
+    }
+    if (!file) {
+      toast.error("No file uploaded");
+      return;
+    }
+    const result = uploadSchema.safeParse({ file });
+    if (!result.success) {
+      toast.error(result.error.errors[0].message);
+      return;
+    }
+
+    const ipfsFile = new File([file], file.name, {
+      type: file.type,
+    });
+
+    let fileUrl = "";
+    try {
+      setLoadingState("fileUploading");
+      const formData = new FormData();
+      formData.append("file", ipfsFile);
+
+      const response = await fetch(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+      fileUrl = result.IpfsHash
+        ? `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`
+        : ``;
+
+      if (!fileUrl) {
+        throw new Error("Failed to get IPFS URL after upload");
+      }
+
+      toast.success("File uploaded to IPFS successfully!", {
+        description: `IPFS URL: ${fileUrl}`,
+      });
+
+      //send data to ipverse
+      const APIResponse = await fetch(`/api/contents/${contentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileUrl,
+          type: getFileType(file.name),
+        }),
+      });
+      toast.success("Ipverse content updated successfully");
+    } catch (error) {
+      console.error("IPFS upload error:", error);
+      toast.error("Failed to upload file to IPFS", {
+        description:
+          "There was an error uploading your file. Please try again.",
+        duration: 5000,
+      });
+      return;
+    } finally {
+      setLoadingState("none");
+    }
+
+    // Auto-fill URL (in a real app this comes from your upload API)
+    setMintData((prev) => ({
+      ...prev,
+      // fileUrl,
+    }));
+  }
+
   function addMetadataField() {
     setMintData((prev) => ({
       ...prev,
@@ -356,110 +362,40 @@ export default function Create() {
         Mint your IP
       </h1>
 
-      {/* Step 1: Upload */}
-      <div className="card">
-        <h2 className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6"`}>
-          1. Upload File
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <label
-              className="block text-sm font-medium text-textPrimary mb-2"
-              htmlFor="upload-content"
-            >
-              Upload Content
-            </label>
-            <div className="flex items-center justify-center w-full">
-              <label
-                className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-card-background border-texttext-textSecondary hover:bg-background-color transition"
-                htmlFor="dropzone-file"
-              >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-10 h-10 mb-3 text-text-secondary"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+      {/* Step 1: Mint */}
+      {
+        <div className={`card`}>
+          <h2
+            className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6`}
+          >
+            1. Metadata
+          </h2>
+          <div className="space-y-6">
+            {/* Info */}
+            <div>
+              <h3 className="text-xl font-semibold mb-4 text-textPrimary">
+                Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label
+                    className="block text-sm font-medium text-text-primary mb-2"
+                    htmlFor="title"
                   >
-                    <path
-                      d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4H7z"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                    ></path>
-                    <path
-                      d="M12 16v-4m0 0l-2-2m2 2l2-2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                    ></path>
-                  </svg>
-                  <p className="mb-2 text-sm text-textSecondary">
-                    <span className="font-semibold">Click to upload</span>
-                    {/* or drag and drop */}
-                  </p>
-                  <p className="text-xs text-textSecondary">
-                    Supported: JPG, PNG, GIF, MP4, MP3, etc.
-                  </p>
+                    Title
+                  </label>
+                  <input
+                    className="input w-full"
+                    id="title"
+                    placeholder="Title"
+                    type="text"
+                    value={mintData.title}
+                    onChange={(e) =>
+                      setMintData({ ...mintData, title: e.target.value })
+                    }
+                  />
                 </div>
-                <input
-                  className="hidden"
-                  id="dropzone-file"
-                  type="file"
-                  onChange={(e) =>
-                    setFile(e.target.files ? e.target.files[0] : null)
-                  }
-                />
-              </label>
-            </div>
-            <button
-              className={`${buttonPrimary} w-full mt-4`}
-              onClick={handleUploadFile}
-            >
-              {loadingState === "fileUploading"
-                ? "Uploading File"
-                : "Upload File"}
-            </button>
-          </div>
-          <div className="bg-ipv-background rounded-lg p-2">
-            <ContentPreview file={file} />
-          </div>
-        </div>
-      </div>
-
-      {/* Step 2: Mint */}
-      <div className={`card ${!stepOneComplete ? "opacity-50" : ""}`}>
-        <h2 className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6`}>
-          2. Metadata
-        </h2>
-        <div className="space-y-6">
-          {/* Info */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4 text-textPrimary">
-              Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label
-                  className="block text-sm font-medium text-text-primary mb-2"
-                  htmlFor="title"
-                >
-                  Title
-                </label>
-                <input
-                  className="input w-full"
-                  id="title"
-                  placeholder="Title"
-                  type="text"
-                  value={mintData.title}
-                  onChange={(e) =>
-                    setMintData({ ...mintData, title: e.target.value })
-                  }
-                  disabled={!stepOneComplete}
-                />
-              </div>
-              <div>
+                {/* <div>
                 <label
                   className="block text-sm font-medium text-text-primary mb-2"
                   htmlFor="url"
@@ -475,224 +411,310 @@ export default function Create() {
                   value={mintData.fileUrl}
                   readOnly
                 />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium text-text-primary mb-2"
-                  htmlFor="url"
-                >
-                  imageURL
-                </label>
+              </div>*/}
+                <div className="md:col-span-2">
+                  <label
+                    className="block text-sm font-medium text-text-primary mb-2"
+                    htmlFor="url"
+                  >
+                    imageURL
+                  </label>
 
-                <input
-                  className="input w-full bg-gray-700 cursor-not-allowed"
-                  id="url"
-                  placeholder="Auto-filled URL"
-                  type="text"
-                  value={mintData.imageUrl}
-                  readOnly
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label
-                  className="block text-sm font-medium text-text-primary mb-2"
-                  htmlFor="description"
-                >
-                  Description
-                </label>
-                <textarea
-                  className="input w-full"
-                  id="description"
-                  placeholder="Description"
-                  rows={3}
-                  value={mintData.description}
-                  onChange={(e) =>
-                    setMintData({ ...mintData, description: e.target.value })
-                  }
-                  disabled={!stepOneComplete}
-                />
-              </div>
-            </div>
-          </div>
-          {/* Metadata */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4 text-textPrimary">
-              Attributes
-            </h3>
-            <div className="space-y-4" id="metadata-fields">
-              {mintData.attributes.map((attr, i) => (
-                <div key={i} className="flex items-end gap-4 mb-2">
-                  <div className="flex-1">
-                    <label
-                      className="block text-sm font-medium text-text-primary mb-2"
-                      htmlFor={`trait-type-${i}`}
-                    >
-                      Trait Type
-                    </label>
-                    <input
-                      className="input w-full"
-                      id={`trait-type-${i}`}
-                      placeholder="e.g., Color"
-                      type="text"
-                      value={attr.trait_type}
-                      onChange={(e) =>
-                        updateMetadataField(i, "trait_type", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label
-                      className="block text-sm font-medium text-text-primary mb-2"
-                      htmlFor={`value-${i}`}
-                    >
-                      Value
-                    </label>
-                    <input
-                      className="input w-full"
-                      id={`value-${i}`}
-                      placeholder="e.g., Blue"
-                      type="text"
-                      value={attr.value}
-                      onChange={(e) =>
-                        updateMetadataField(i, "value", e.target.value)
-                      }
-                    />
-                  </div>
-                  {i < mintData.attributes.length - 1 ? (
-                    <button
-                      className={`${buttonSecondary} p-2`}
-                      onClick={() => removeMetadataField(i)}
-                    >
-                      ❌
-                    </button>
-                  ) : (
-                    <button
-                      className={`${buttonSecondary} mt-2`}
-                      onClick={addMetadataField}
-                      disabled={!stepOneComplete}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                        ></path>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* License */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4 text-text-primary">
-              License
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  className="block text-sm font-medium text-text-primary mb-2"
-                  htmlFor="price"
-                >
-                  Price
-                </label>
-                <input
-                  className="input w-full"
-                  id="price"
-                  placeholder="Enter amount"
-                  type="number"
-                  value={mintData.price}
-                  onChange={(e) =>
-                    setMintData({ ...mintData, price: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium text-text-primary mb-2"
-                  htmlFor="duration"
-                >
-                  Duration
-                </label>
-                <div className="flex gap-2">
                   <input
-                    className="input w-1/2"
-                    id="duration"
-                    placeholder="Duration"
-                    type="number"
-                    value={mintData.duration}
+                    className="input w-full bg-gray-700 cursor-not-allowed"
+                    id="url"
+                    placeholder="Auto-filled URL"
+                    type="text"
+                    value={mintData.imageUrl}
+                    readOnly
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label
+                    className="block text-sm font-medium text-text-primary mb-2"
+                    htmlFor="description"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    className="input w-full"
+                    id="description"
+                    placeholder="Description"
+                    rows={3}
+                    value={mintData.description}
                     onChange={(e) =>
-                      setMintData({ ...mintData, duration: e.target.value })
+                      setMintData({ ...mintData, description: e.target.value })
                     }
                   />
-                  <select
-                    className="input w-1/2"
-                    value={mintData.durationUnit}
-                    onChange={(e) =>
-                      setMintData({
-                        ...mintData,
-                        durationUnit: e.target.value,
-                      })
-                    }
-                  >
-                    <option>Days</option>
-                    <option>Weeks</option>
-                    <option>Months</option>
-                  </select>
                 </div>
               </div>
             </div>
-          </div>
+            {/* Metadata */}
+            <div>
+              <h3 className="text-sm font-semibold mb-4 text-textPrimary">
+                Attributes
+              </h3>
+              <div className="space-y-4" id="metadata-fields">
+                {mintData.attributes.map((attr, i) => (
+                  <div key={i} className="flex items-end gap-4 mb-2">
+                    <div className="flex-1">
+                      <label
+                        className="block text-sm font-medium text-text-primary mb-2"
+                        htmlFor={`trait-type-${i}`}
+                      >
+                        Trait Type
+                      </label>
+                      <input
+                        className="input w-full"
+                        id={`trait-type-${i}`}
+                        placeholder="e.g., Color"
+                        type="text"
+                        value={attr.trait_type}
+                        onChange={(e) =>
+                          updateMetadataField(i, "trait_type", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label
+                        className="block text-sm font-medium text-text-primary mb-2"
+                        htmlFor={`value-${i}`}
+                      >
+                        Value
+                      </label>
+                      <input
+                        className="input w-full"
+                        id={`value-${i}`}
+                        placeholder="e.g., Blue"
+                        type="text"
+                        value={attr.value}
+                        onChange={(e) =>
+                          updateMetadataField(i, "value", e.target.value)
+                        }
+                      />
+                    </div>
+                    {i < mintData.attributes.length - 1 ? (
+                      <button
+                        className={`${buttonSecondary} p-2`}
+                        onClick={() => removeMetadataField(i)}
+                      >
+                        ❌
+                      </button>
+                    ) : (
+                      <button
+                        className={`${buttonSecondary} mt-2`}
+                        onClick={addMetadataField}
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                          ></path>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* License */}
+            <div>
+              <h3 className="text-xl font-semibold mb-4 text-text-primary">
+                License
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    className="block text-sm font-medium text-text-primary mb-2"
+                    htmlFor="price"
+                  >
+                    Price
+                  </label>
+                  <input
+                    className="input w-full"
+                    id="price"
+                    placeholder="Enter amount"
+                    type="number"
+                    value={mintData.price}
+                    onChange={(e) =>
+                      setMintData({ ...mintData, price: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium text-text-primary mb-2"
+                    htmlFor="duration"
+                  >
+                    Duration
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      className="input w-1/2"
+                      id="duration"
+                      placeholder="Duration"
+                      type="number"
+                      value={mintData.duration}
+                      onChange={(e) =>
+                        setMintData({ ...mintData, duration: e.target.value })
+                      }
+                    />
+                    <select
+                      className="input w-1/2"
+                      value={mintData.durationUnit}
+                      onChange={(e) =>
+                        setMintData({
+                          ...mintData,
+                          durationUnit: e.target.value,
+                        })
+                      }
+                    >
+                      <option>Days</option>
+                      <option>Weeks</option>
+                      <option>Months</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          {file && showFileCard && (
-            <FileCard
-              title={mintData.title}
-              fileTypeIcon={getFileIcon(file.type || "")}
-              contentId={contentId}
-              onImageGenerated={(file) => setMintFile(file)}
-            />
-          )}
+            {showFileCard && (
+              <FileCard
+                title={mintData.title}
+                fileTypeIcon={getFileIcon(mintFile?.type || "")}
+                contentId={contentId}
+                onImageGenerated={(file) => setMintFile(file)}
+              />
+            )}
 
-          <div className="flex justify-between pt-4">
-            <button
-              className={`${buttonSecondary} w-full md:w-auto`}
-              onClick={() => {
-                setShowFileCard(true);
-              }}
-              disabled={!mintData.title}
-            >
-              Generate IpNFT
-            </button>
-            <button
-              className={`${buttonPrimary} w-full md:w-auto`}
-              onClick={handleUploadImage}
-              disabled={!stepOneComplete || !mintFile}
-            >
-              {loadingState == "imageUploading"
-                ? "Uploading IpNFT"
-                : "Upload IpNFT"}
-            </button>
-          </div>
-          <div>
-            <button
-              className={`${buttonPrimary} w-full md:w-auto`}
-              onClick={handleMintSubmit}
-              disabled={!stepTwoComplete}
-            >
-              {loadingState == "minting" ? "Minting" : " Mint IP"}
-            </button>
+            <div className="flex items-center justify-between pt-4">
+              <div className="flex justify-start gap-4">
+                <button
+                  className={`${buttonSecondary} w-full md:w-auto`}
+                  onClick={() => {
+                    console.log("generating");
+                    console.log(showFileCard);
+                    setShowFileCard(true);
+                    console.log(showFileCard);
+                  }}
+                  disabled={!mintData.title}
+                >
+                  Generate IpNFT
+                </button>
+
+                {mintFile && (
+                  <button
+                    className={`${buttonPrimary} w-full md:w-auto`}
+                    onClick={handleUploadImage}
+                    disabled={!mintFile}
+                  >
+                    {loadingState == "imageUploading"
+                      ? "Uploading IpNFT"
+                      : "Upload IpNFT"}
+                  </button>
+                )}
+                {stepOneComplete && (
+                  <div>
+                    <button
+                      className={`${buttonPrimary} w-full md:w-auto`}
+                      onClick={handleMintSubmit}
+                      disabled={!stepOneComplete}
+                    >
+                      {loadingState == "minting" ? "Minting" : " Mint IP"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      }
+
+      {/* Step 2: Upload */}
+      {stepTwoComplete && (
+        <div className="card">
+          <h2
+            className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6"`}
+          >
+            2. Upload File
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <label
+                className="block text-sm font-medium text-textPrimary mb-2"
+                htmlFor="upload-content"
+              >
+                Upload Content
+              </label>
+              <div className="flex items-center justify-center w-full">
+                <label
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-card-background border-texttext-textSecondary hover:bg-background-color transition"
+                  htmlFor="dropzone-file"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg
+                      className="w-10 h-10 mb-3 text-text-secondary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4H7z"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                      ></path>
+                      <path
+                        d="M12 16v-4m0 0l-2-2m2 2l2-2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                      ></path>
+                    </svg>
+                    <p className="mb-2 text-sm text-textSecondary">
+                      <span className="font-semibold">Click to upload</span>
+                      {/* or drag and drop */}
+                    </p>
+                    <p className="text-xs text-textSecondary">
+                      Supported: JPG, PNG, GIF, MP4, MP3, etc.
+                    </p>
+                  </div>
+                  <input
+                    className="hidden"
+                    id="dropzone-file"
+                    type="file"
+                    onChange={(e) =>
+                      setFile(e.target.files ? e.target.files[0] : null)
+                    }
+                  />
+                </label>
+              </div>
+              <button
+                className={`${buttonPrimary} w-full mt-4`}
+                onClick={handleUploadFile}
+                disabled={!stepTwoComplete}
+              >
+                {loadingState === "fileUploading"
+                  ? "Uploading File"
+                  : "Upload File"}
+              </button>
+            </div>
+            <div className="bg-ipv-background rounded-lg p-2">
+              <ContentPreview file={file} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

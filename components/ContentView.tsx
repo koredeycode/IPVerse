@@ -10,19 +10,19 @@ interface MetadataAttribute {
 }
 
 interface ContentViewProps {
-  title?: string;
-  creator?: string;
-  date?: string;
-  category?: string;
-  fileUrl?: string;
-  attributes?: MetadataAttribute[];
+  title: string;
+  creator: string;
+  date: string;
+  type: string;
+  fileUrl: string;
+  attributes: MetadataAttribute[];
 }
 
 const ContentView = ({
-  title = "Exclusive Content Title",
-  creator = "Sophia Carter",
+  title,
+  creator,
   date = "July 15, 2024",
-  category = "Art",
+  type,
   fileUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
   // fileUrl = "https://raw.githubusercontent.com/koredeycode/IPVerse/refs/heads/main/README.md",
   attributes = [
@@ -130,8 +130,8 @@ const ContentView = ({
               <p className="text-base text-textPrimary">{date}</p>
             </div>
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-textSecondary">Category</p>
-              <p className="text-base text-textPrimary">{category}</p>
+              <p className="text-sm font-medium text-textSecondary">Type</p>
+              <p className="text-base text-textPrimary">{type}</p>
             </div>
           </div>
         </div>

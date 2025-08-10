@@ -3,6 +3,7 @@ import { fromTotalSeconds } from "@/lib/content";
 import { useAuth } from "@campnetwork/origin/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Address } from "viem";
 import { buttonPrimary } from "./styles";
 
@@ -15,10 +16,10 @@ interface NoContentViewProps {
   title?: string;
   creator?: string;
   date?: string;
-  category?: string;
+  type?: string;
   fileUrl?: string;
   subscriptionPrice?: string;
-  subscriptionDetails?: string;
+  // subscriptionDetails?: string;
   tokenId?: bigint;
 }
 type LicenseTerms = {
@@ -28,16 +29,17 @@ type LicenseTerms = {
   paymentToken: Address;
 };
 const NoContentView: React.FC<NoContentViewProps> = ({
-  title = "Exclusive Content Title",
-  creator = "Sophia Carter",
+  title = "Restricted Content",
+  creator = "@ipVerse",
   date = "July 15, 2024",
-  category = "Art",
+  type = "Art",
   fileUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
   // subscriptionPrice = "$5/month",
   // subscriptionDetails = "Billed monthly. Cancel anytime.",
   tokenId,
 }) => {
   const [price, setPrice] = useState(0);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [duration, setDuration] = useState<{
     duration: number;
     unit: string;
@@ -60,9 +62,58 @@ const NoContentView: React.FC<NoContentViewProps> = ({
   }, [tokenId]);
 
   async function handleSubscription() {
-    if (tokenId) await auth.origin?.buyAccessSmart(tokenId, 1);
-    //send update to the appwrite database
-    router.refresh();
+    try {
+      setIsSubscribing(true);
+      if (tokenId) await auth.origin?.buyAccessSmart(tokenId, 1);
+      toast.success("Subscribed successfully");
+
+      //send update to the appwrite database
+      // const APIResponse = await fetch(`/api/subscriptions`, {
+      //         method: "POST",
+      //         headers: { "Content-Type": "application/json" },
+      //         body: JSON.stringify({
+      //           subscriber, id
+      //         }),
+      //       });
+      router.refresh();
+    } catch (error) {
+      console.error("Subscription failed:", error);
+
+      // Provide more specific error messages
+      let errorMessage = "Subscription failed. Please try again later.";
+      let errorDescription =
+        error instanceof Error ? error.message : "An error occurred";
+
+      if (
+        errorDescription.includes("signature") ||
+        errorDescription.includes("Failed to get signature")
+      ) {
+        errorMessage = "Transaction signature failed.";
+        errorDescription =
+          "Please check your wallet connection and approve the transaction when prompted.";
+      } else if (errorDescription.includes("network")) {
+        errorMessage = "Network error. Please check your connection.";
+        errorDescription = "Make sure you're connected to the correct network.";
+      } else if (errorDescription.includes("gas")) {
+        errorMessage = "Insufficient gas fees.";
+        errorDescription =
+          "Please ensure you have enough gas for the transaction.";
+      } else if (
+        errorDescription.includes("user rejected") ||
+        errorDescription.includes("User rejected")
+      ) {
+        errorMessage = "Transaction was rejected.";
+        errorDescription =
+          "You declined the transaction. Please try again and approve when prompted.";
+      }
+
+      toast.error(errorMessage, {
+        description: errorDescription,
+        duration: 5000,
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
   }
 
   return (
@@ -99,10 +150,8 @@ const NoContentView: React.FC<NoContentViewProps> = ({
                 <p className="text-base text-textPrimary">{date}</p>
               </div>
               <div className="flex flex-col">
-                <p className="text-sm font-medium text-textSecondary">
-                  Category
-                </p>
-                <p className="text-base text-textPrimary">{category}</p>
+                <p className="text-sm font-medium text-textSecondary">Type</p>
+                <p className="text-base text-textPrimary">{type}</p>
               </div>
             </div>
           </div>
@@ -122,8 +171,7 @@ const NoContentView: React.FC<NoContentViewProps> = ({
               Unlock Exclusive Content
             </h2>
             <p className="typography_body text-textSecondary mb-6">
-              Subscribe to {creator} to get access to this and other exclusive
-              content.
+              Subscribe to {creator} to get access to this exclusive content.
             </p>
             <div className="mb-4 text-left">
               <p className="text-lg font-bold text-textPrimary">
@@ -136,7 +184,7 @@ const NoContentView: React.FC<NoContentViewProps> = ({
               onClick={handleSubscription}
               className={`${buttonPrimary} w-full max-w-xs`}
             >
-              Subscribe Now
+              {isSubscribing ? "Subscribing" : "Subscribe Now"}
             </button>
           </div>
         </div>

@@ -183,10 +183,10 @@ const Navbar = () => {
   // };
 
   return (
-    <nav className="flex items-center justify-between h-16 border-b border-white/10 p-6">
-      <div className="flex items-center justify-between gap-4 w-full">
+    <nav className="flex items-center justify-end gap-4 h-16 border-b border-white/10 p-6">
+      <div className="flex items-center justify-between gap-4">
         {/* Search */}
-        <label className="relative flex-1 flex items-center min-w-48 max-w-sm">
+        {/* <label className="relative flex-1 flex items-center min-w-48 max-w-sm">
           <div
             className="absolute left-3 text-textSecondary"
             data-icon="MagnifyingGlass"
@@ -211,77 +211,85 @@ const Navbar = () => {
               setSearch(e.target.value);
             }}
           />
-        </label>
+        </label> */}
 
-        {/* Wallet + Dropdown */}
-        <div className="relative group">{/* Dropdown */}</div>
+        <Link
+          href="https://faucet.campnetwork.xyz"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm w-full"
+        >
+          <button
+            onClick={disconnect}
+            className={`${buttonSecondary} w-full text-sm`}
+          >
+            Claim Faucet
+          </button>
+        </Link>
       </div>
-      {/* ✅ closes .flex.items-center gap-4 */}
-      <Popover>
-        <PopoverTrigger className="sm:flex items-center gap-2 cursor-pointer">
-          {/* <button className="button_primary hidden sm:flex items-center gap-2"> */}
-          <span>{wallet ? truncate(wallet?.address) : "0x00..00"}</span>
-          <img
-            alt="User avatar"
-            className="h-8 w-8 rounded-full"
-            src={`https://unavatar.io/x/${getLoggedInUserTwitter()}`}
-          />
-          {/* </button> */}
-        </PopoverTrigger>
-        <PopoverContent className="bg-transparent outline-none border-none right-1">
-          <div className="absolute right-0 w-72 bg-cardBg text-textSecondary border border-[var(--input-border)] rounded-xl shadow-lg p-4">
-            {isLoadingBalance ? (
-              <div className="text-sm text-textSecondary">
-                Loading balance...
-              </div>
-            ) : (
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-textSecondary">Balance</span>
-                <span className="font-bold">
-                  {balance?.formatted.slice(0, 7)} CAMP
-                </span>
-              </div>
-            )}
 
-            <div className="flex flex-col justify-between items-center mb-4">
-              <Link
-                href="https://faucet.campnetwork.xyz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm w-full"
-              >
+      {/* ✅ closes .flex.items-center gap-4 */}
+      <div className="flex gap-4">
+        <Popover>
+          <PopoverTrigger className="sm:flex items-center gap-2 cursor-pointer">
+            {/* <button className="button_primary hidden sm:flex items-center gap-2"> */}
+            <span>{wallet ? truncate(wallet?.address) : "0x00..00"}</span>
+            <img
+              alt="User avatar"
+              className="h-8 w-8 rounded-full"
+              src={`https://unavatar.io/x/${getLoggedInUserTwitter()}`}
+            />
+            {/* </button> */}
+          </PopoverTrigger>
+          <PopoverContent className="bg-transparent outline-none border-none right-1">
+            <div className="absolute right-0 w-72 bg-cardBg text-textSecondary border border-[var(--input-border)] rounded-xl shadow-lg p-4">
+              {isLoadingBalance ? (
+                <div className="text-sm text-textSecondary">
+                  Loading balance...
+                </div>
+              ) : (
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-textSecondary">Balance</span>
+                  <span className="font-bold">
+                    {balance?.formatted.slice(0, 7)} CAMP
+                  </span>
+                </div>
+              )}
+
+              <div className="border-t border-[var(--input-border)] my-4"></div>
+
+              {/* Socials */}
+              {/* <div>
+                <h3 className="text-sm font-medium mb-3">
+                  Origin Connected Accounts
+                </h3>
+                <ConnectedSocials />
+              </div>
+              <div className="border-t border-[var(--input-border)] my-4"></div> */}
+              <div className="flex flex-col gap-4">
                 <button
-                  onClick={disconnect}
+                  onClick={() => {
+                    openCampModal();
+                  }}
                   className={`${buttonSecondary} w-full text-sm`}
                 >
-                  Claim Faucet
+                  View Origin
                 </button>
-              </Link>
+
+                <button
+                  onClick={() => {
+                    localStorage.clear();
+                    router.push("/signin");
+                  }}
+                  className={`${buttonSecondary} w-full text-sm`}
+                >
+                  Logout
+                </button>
+              </div>
             </div>
-
-            <div className="border-t border-[var(--input-border)] my-4"></div>
-
-            {/* Socials */}
-            <div>
-              <h3 className="text-sm font-medium mb-3">
-                Origin Connected Accounts
-              </h3>
-              <ConnectedSocials />
-            </div>
-            <div className="border-t border-[var(--input-border)] my-4"></div>
-
-            <button
-              onClick={() => {
-                localStorage.clear();
-                router.push("/signin");
-              }}
-              className={`${buttonSecondary} w-full text-sm`}
-            >
-              Logout
-            </button>
-          </div>
-        </PopoverContent>
-      </Popover>
+          </PopoverContent>
+        </Popover>
+      </div>
     </nav>
   );
 };

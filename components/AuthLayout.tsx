@@ -2,7 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { useAuthState } from "@campnetwork/origin/react";
+import { useAuth, useAuthState } from "@campnetwork/origin/react";
 import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,10 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   const { authenticated, loading } = useAuthState();
+  const auth = useAuth();
+
+  console.log(auth);
+
   const { authenticated: privyAuthenticated, ready } = usePrivy();
   const router = useRouter();
 
@@ -49,6 +53,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         </Link>
       </div>
     );
+  }
+
+  if (authenticated) {
   }
 
   // Authenticated state: render sidebar, navbar, and children

@@ -5,15 +5,11 @@ import { Query } from "node-appwrite";
 
 export async function POST(request: Request) {
   try {
-    const { fileUrl, creator, type } = await request.json();
+    const { imageUrl } = await request.json();
 
-    if (
-      !fileUrl ||
-      !creator ||
-      !["video", "audio", "image", "text"].includes(type)
-    ) {
+    if (!imageUrl) {
       return NextResponse.json(
-        { error: "Missing or invalid file, creator, or type" },
+        { error: "Missing or invalid file" },
         { status: 400 }
       );
     }
@@ -22,7 +18,7 @@ export async function POST(request: Request) {
       databaseId,
       contentCollectionId,
       ID.unique(),
-      { fileUrl, creator, type }
+      { imageUrl }
     );
     return NextResponse.json(content);
   } catch (error) {

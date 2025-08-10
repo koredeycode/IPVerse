@@ -18,8 +18,8 @@ interface ContentData {
   name: string;
   creator: string;
   date: string;
-  category: string;
-  file: string;
+  type: string;
+  fileUrl: string;
   attributes: MetadataAttribute[];
 }
 
@@ -32,7 +32,27 @@ const getTokenId = async (id: string): Promise<bigint> => {
     }
     const APIData = await APIResponse.json();
     const tokenId = APIData.tokenId;
+    if (!tokenId || isNaN(Number(tokenId))) {
+      throw new Error("Invalid token ID from API");
+    }
     return BigInt(tokenId);
+  } catch (error) {
+    throw error instanceof Error ? error : new Error("An error occurred");
+  }
+};
+
+const getFileUrl = async (id: string): Promise<string> => {
+  try {
+    const APIResponse = await fetch(`/api/contents/${id}/fileUrl`);
+    if (!APIResponse.ok) {
+      throw new Error("Failed to fetch content by ID");
+    }
+    const APIData = await APIResponse.json();
+    const fileUrl = APIData.fileUrl;
+    if (!fileUrl) {
+      throw new Error("Can't get fileUrl");
+    }
+    return fileUrl;
   } catch (error) {
     throw error instanceof Error ? error : new Error("An error occurred");
   }
@@ -70,18 +90,28 @@ const ContentPage = () => {
         setTokenId(tokenId);
         const owner = await origin?.ownerOf(tokenId);
         console.log("owner", owner);
-        const hasAccess = await origin?.hasAccess(address, tokenId);
+        const hasAccess = (await origin?.hasAccess(address, tokenId)) ?? false;
         console.log("hasAccess:", hasAccess);
         if (hasAccess || owner === address) {
-          setAccess(false);
+          setAccess(true);
           const tokenUri = await origin?.tokenURI(tokenId);
+          const fileUrl = await getFileUrl(id);
 
           const response = await fetch(tokenUri);
           const data = await response.json();
 
-          setContentData(data);
+          setContentData({ ...data, fileUrl });
         } else {
           setAccess(false);
+          setContentData({
+            name: "Dummy",
+            creator: "dummy",
+            date: "today",
+            type: "image",
+            fileUrl:
+              "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
+            attributes: [],
+          });
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -93,7 +123,6 @@ const ContentPage = () => {
           description: message,
           duration: 5000,
         });
-        setIsLoading(false);
       } finally {
         setIsLoading(false);
       }
@@ -150,17 +179,17 @@ const ContentPage = () => {
       title={contentData.name}
       creator={contentData.creator}
       date={contentData.date}
-      category={contentData.category}
-      fileUrl={contentData.file}
+      type={contentData.type}
+      fileUrl={contentData.fileUrl}
       attributes={contentData.attributes}
     />
   ) : (
     <NoContentView
       title={contentData.name}
-      creator={contentData.creator}
-      date={contentData.date}
-      category={contentData.category}
-      fileUrl={contentData.file}
+      creator={contentData.creator || "IpVerse"}
+      date={contentData.date || "Today"}
+      type={contentData.type}
+      fileUrl={contentData.fileUrl}
       tokenId={tokenId}
       // subscriptionPrice={contentData.subscriptionPrice}
       // subscriptionDetails={contentData.subscriptionDetails}

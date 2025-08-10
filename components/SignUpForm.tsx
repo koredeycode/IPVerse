@@ -44,7 +44,7 @@ const SignUpForm = ({ wallet }: { wallet: string }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, bio, twitter, wallet }),
       });
-      const user = (await response.json())[0];
+      const user = await response.json();
 
       localStorage.setItem("IPVERSE_USER", JSON.stringify(user));
 
