@@ -71,6 +71,7 @@ export default function ConnectSection({
             router.push("/explore");
           } else {
             router.push("/signup");
+            router.refresh();
           }
         } else {
           openCampModal();
@@ -145,14 +146,14 @@ export default function ConnectSection({
           </button>
 
           {/* Disconnect Button */}
-          {wallet?.address && authenticated && (
+          {/* {wallet?.address && authenticated && (
             <button
               onClick={disconnect}
               className={`${buttonSecondary} mt-4 bg-transparent w-full border border-textSecondary text-textSecondary py-2 px-4 rounded-lg hover:bg-cardBg transition-colors`}
             >
               Disconnect Origin
             </button>
-          )}
+          )} */}
 
           {/* Balance Warning */}
           {!hasEnoughCamp && !isLoadingBalance && wallet?.address && (

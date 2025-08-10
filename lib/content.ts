@@ -90,3 +90,27 @@ export const getTotalSeconds = (duration: number, unit: string): number => {
 
   return duration * (secondsIn[unit as keyof typeof secondsIn] || 0);
 };
+
+export const fromTotalSeconds = (
+  totalSeconds: number
+): { duration: number; unit: string } => {
+  const secondsIn = {
+    Days: 24 * 60 * 60,
+    Weeks: 7 * 24 * 60 * 60,
+    Months: 30 * 24 * 60 * 60, // Assuming 30 days per month
+  };
+
+  // Choose the largest unit possible
+  if (totalSeconds % secondsIn.Months === 0) {
+    return { duration: totalSeconds / secondsIn.Months, unit: "Months" };
+  }
+  if (totalSeconds % secondsIn.Weeks === 0) {
+    return { duration: totalSeconds / secondsIn.Weeks, unit: "Weeks" };
+  }
+  if (totalSeconds % secondsIn.Days === 0) {
+    return { duration: totalSeconds / secondsIn.Days, unit: "Days" };
+  }
+
+  // Fallback — return in seconds
+  return { duration: totalSeconds, unit: "Seconds" };
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { truncate } from "@/lib/utils";
+import { getLoggedInUserTwitter, truncate } from "@/lib/utils";
 import {
   useAuthState,
   useConnect,
@@ -10,7 +10,7 @@ import {
 } from "@campnetwork/origin/react";
 import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useBalance } from "wagmi";
 import { parseEther, parseGwei } from "viem";
@@ -171,6 +171,7 @@ const Navbar = () => {
   });
 
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
   // const handleSocialToggle = (platform: string, connected: boolean) => {
   //   if (platform === "twitter") {
@@ -224,7 +225,7 @@ const Navbar = () => {
           <img
             alt="User avatar"
             className="h-8 w-8 rounded-full"
-            src="https://unavatar.io/x/korefomo"
+            src={`https://unavatar.io/x/${getLoggedInUserTwitter()}`}
           />
           {/* </button> */}
         </PopoverTrigger>
@@ -271,10 +272,13 @@ const Navbar = () => {
             <div className="border-t border-[var(--input-border)] my-4"></div>
 
             <button
-              onClick={disconnect}
+              onClick={() => {
+                localStorage.clear();
+                router.push("/signin");
+              }}
               className={`${buttonSecondary} w-full text-sm`}
             >
-              Disconnect Wallet
+              Logout
             </button>
           </div>
         </PopoverContent>

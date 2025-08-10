@@ -41,6 +41,7 @@ export default function Create() {
   const [stepTwoComplete, setStepTwoComplete] = useState(false);
 
   const [showFileCard, setShowFileCard] = useState(false);
+  const [loadingState, setLoadingState] = useState<string>("none");
 
   const [contentId, setContentId] = useState<any>();
 
@@ -74,6 +75,7 @@ export default function Create() {
 
     let fileUrl = "";
     try {
+      setLoadingState("fileUploading");
       const formData = new FormData();
       formData.append("file", ipfsFile);
 
@@ -125,6 +127,8 @@ export default function Create() {
         duration: 5000,
       });
       return;
+    } finally {
+      setLoadingState("none");
     }
 
     // Auto-fill URL (in a real app this comes from your upload API)
@@ -158,6 +162,7 @@ export default function Create() {
 
     let imageUrl = "";
     try {
+      setLoadingState("imageUploading");
       const formData = new FormData();
       formData.append("file", ipfsFile);
 
@@ -204,6 +209,8 @@ export default function Create() {
         duration: 5000,
       });
       return;
+    } finally {
+      setLoadingState("none");
     }
 
     // Auto-fill URL (in a real app this comes from your upload API)
@@ -254,9 +261,13 @@ export default function Create() {
       image: mintData.imageUrl,
       file: mintData.fileUrl,
       attributes: mintData.attributes,
+      // date
+      //creator
     };
 
     try {
+      setLoadingState("minting");
+      console.log(mintFile, metadata, license);
       const tokenId = await origin.mintFile(mintFile, metadata, license);
 
       // 62969147512708210739597738314450365440119337125482253728267133656897450032217
@@ -308,6 +319,8 @@ export default function Create() {
         description: errorDescription,
         duration: 5000,
       });
+    } finally {
+      setLoadingState("none");
     }
   }
 
@@ -373,7 +386,7 @@ export default function Create() {
                       d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4H7z"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      stroke-width="2"
+                      strokeWidth="2"
                     ></path>
                     <path
                       d="M12 16v-4m0 0l-2-2m2 2l2-2"
@@ -404,7 +417,9 @@ export default function Create() {
               className={`${buttonPrimary} w-full mt-4`}
               onClick={handleUploadFile}
             >
-              Upload File
+              {loadingState === "fileUploading"
+                ? "Uploading File"
+                : "Upload File"}
             </button>
           </div>
           <div className="bg-ipv-background rounded-lg p-2">
@@ -662,7 +677,9 @@ export default function Create() {
               onClick={handleUploadImage}
               disabled={!stepOneComplete || !mintFile}
             >
-              Upload IpNFT
+              {loadingState == "imageUploading"
+                ? "Uploading IpNFT"
+                : "Upload IpNFT"}
             </button>
           </div>
           <div>
@@ -671,7 +688,7 @@ export default function Create() {
               onClick={handleMintSubmit}
               disabled={!stepTwoComplete}
             >
-              Mint IP
+              {loadingState == "minting" ? "Minting" : " Mint IP"}
             </button>
           </div>
         </div>

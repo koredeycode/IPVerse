@@ -1,5 +1,6 @@
 import React from "react";
 import SidebarNavLink from "./SidebarNavLink";
+import { getLoggedInUserTwitter } from "@/lib/utils";
 
 const Sidebar = () => {
   return (
@@ -75,11 +76,11 @@ const Sidebar = () => {
         <div
           className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
           style={{
-            backgroundImage: `url('https://unavatar.io/x/korefomo')`,
+            backgroundImage: `url('https://unavatar.io/x/${getLoggedInUserTwitter()}')`,
           }}
         ></div>
         <div>
-          <h3 className="font-semibold">@korefomo</h3>
+          <h3 className="font-semibold">@{getLoggedInUserTwitter()}</h3>
           <p className="text-sm text-textSecondary">Creator</p>
         </div>
       </div>

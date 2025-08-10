@@ -56,7 +56,7 @@ export const GalleryItem = ({
     <div className="flex flex-col gap-3 group">
       <Link
         className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg overflow-hidden relative"
-        href="/content?tokenUri=1"
+        href="/content/6897edbd0011ce44858d"
         style={{
           backgroundImage: `url('${image_url}')`,
         }}

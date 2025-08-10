@@ -1,5 +1,10 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { buttonPrimary } from "./styles";
+import { useAuth } from "@campnetwork/origin/react";
+import { fromTotalSeconds } from "@/lib/content";
+import { Address } from "viem";
+import { useRouter } from "next/navigation";
 
 interface MetadataAttribute {
   trait_type: string;
@@ -14,17 +19,52 @@ interface NoContentViewProps {
   fileUrl?: string;
   subscriptionPrice?: string;
   subscriptionDetails?: string;
+  tokenId?: bigint;
 }
-
+type LicenseTerms = {
+  price: bigint;
+  duration: number;
+  royaltyBps: number;
+  paymentToken: Address;
+};
 const NoContentView: React.FC<NoContentViewProps> = ({
   title = "Exclusive Content Title",
   creator = "Sophia Carter",
   date = "July 15, 2024",
   category = "Art",
   fileUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
-  subscriptionPrice = "$5/month",
-  subscriptionDetails = "Billed monthly. Cancel anytime.",
+  // subscriptionPrice = "$5/month",
+  // subscriptionDetails = "Billed monthly. Cancel anytime.",
+  tokenId,
 }) => {
+  const [price, setPrice] = useState(0);
+  const [duration, setDuration] = useState<{
+    duration: number;
+    unit: string;
+  }>();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const { origin } = auth;
+  useEffect(() => {
+    const getLicense = async () => {
+      if (!tokenId) {
+        return;
+      }
+      const data = await origin?.getTerms(tokenId);
+      console.log(data);
+      setPrice(Number(data.price) / 10 ** 18);
+      setDuration(fromTotalSeconds(data.duration));
+    };
+    getLicense();
+  }, [tokenId]);
+
+  async function handleSubscription() {
+    if (tokenId) await auth.origin?.buyAccessSmart(tokenId, 1);
+    //send update to the appwrite database
+    router.refresh();
+  }
+
   return (
     <div className="w-full max-w-4xl">
       <div className="mb-6 flex items-center gap-2 text-sm">
@@ -67,6 +107,7 @@ const NoContentView: React.FC<NoContentViewProps> = ({
             </div>
           </div>
         </div>
+
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-cardBg/80 p-6 backdrop-blur-sm">
           <div className="text-center">
             <svg
@@ -86,13 +127,15 @@ const NoContentView: React.FC<NoContentViewProps> = ({
             </p>
             <div className="mb-4 text-left">
               <p className="text-lg font-bold text-textPrimary">
-                Subscription: {subscriptionPrice}
+                Subscription: {price} CAMP for {duration?.duration}{" "}
+                {duration?.unit}
               </p>
-              <p className="text-sm text-textSecondary">
-                {subscriptionDetails}
-              </p>
+              <p className="text-sm text-textSecondary">hi</p>
             </div>
-            <button className={`${buttonPrimary} w-full max-w-xs`}>
+            <button
+              onClick={handleSubscription}
+              className={`${buttonPrimary} w-full max-w-xs`}
+            >
               Subscribe Now
             </button>
           </div>
