@@ -19,3 +19,9 @@ export const getLoggedInUserTwitter = () => {
   }
   return twitter;
 };
+
+export const getUserInfo = async (address: string) => {
+  const response = await fetch(`/api/users?wallet=${address}`);
+  const data = await response.json();
+  return data;
+};

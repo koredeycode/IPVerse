@@ -1,7 +1,9 @@
 "use client";
 
+import { getUserInfo } from "@/lib/utils";
 import { useAuth } from "@campnetwork/origin/react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { parseEther } from "viem";
@@ -11,6 +13,7 @@ import { buttonPrimary } from "./styles";
 type ConnectSectionProps = {
   wallet: any;
   authenticated: boolean;
+  privyAuthenticated: boolean;
   openCampModal: () => void;
   login: () => void;
   disconnect: () => void;
@@ -18,6 +21,7 @@ type ConnectSectionProps = {
 
 export default function ConnectSection({
   wallet,
+  privyAuthenticated,
   authenticated,
   openCampModal,
   login,
@@ -31,13 +35,21 @@ export default function ConnectSection({
   });
 
   const hasEnoughCamp = balance ? balance.value > parseEther("0.01") : false;
-  const getUserInfo = async () => {
-    const response = await fetch(`/api/users?wallet=${wallet?.address}`);
-    const data = await response.json();
-    return data;
-  };
 
   const handleClick = async () => {
+    if (authenticated && privyAuthenticated && wallet) {
+      const user = (await getUserInfo(wallet.address))[0];
+
+      if (user) {
+        localStorage.setItem("IPVERSE_USER", JSON.stringify(user));
+        router.push("/explore");
+        return;
+      } else {
+        router.push("/signup");
+        router.refresh();
+        return;
+      }
+    }
     try {
       if (wallet?.address) {
         if (authenticated) {
@@ -64,7 +76,7 @@ export default function ConnectSection({
             });
             return;
           }
-          const user = (await getUserInfo())[0];
+          const user = (await getUserInfo(wallet?.address))[0];
 
           if (user) {
             localStorage.setItem("IPVERSE_USER", JSON.stringify(user));
@@ -135,9 +147,34 @@ export default function ConnectSection({
             onClick={handleClick}
             className={`${buttonPrimary} hover:bg-buttonHover text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold`}
           >
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M22.361,12.253l-3.333-6.13a.5.5,0,0,0-.883.029L16.27,9.789,12.518,2.72a.5.5,0,0,0-.883,0L7.883,9.789,6.008,6.152a.5.5,0,0,0-.883-.029L1.792,12.253a.5.5,0,0,0,.442.747h3.4l2.842,5.228a.5.5,0,0,0,.883,0L12,13.2l2.642,5.028a.5.5,0,0,0,.883,0L18.367,13h3.4a.5.5,0,0,0,.442-.747Z"></path>
-            </svg>
+            {wallet?.address ? (
+              authenticated ? (
+                <Image
+                  alt="app logo"
+                  src={"/globe.svg"}
+                  width={5}
+                  height={5}
+                  className="h-8 w-8"
+                />
+              ) : (
+                <Image
+                  alt="camp logo"
+                  src={"/camp.svg"}
+                  width={5}
+                  height={5}
+                  className="h-8 w-8"
+                />
+              )
+            ) : (
+              <Image
+                alt="wallet-icon"
+                src={"/wallet-icon.svg"}
+                width={5}
+                height={5}
+                className="h-8 w-8"
+              />
+            )}
+
             {wallet?.address
               ? authenticated
                 ? "Enter the IPVerse"

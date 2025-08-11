@@ -24,11 +24,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       appId="cmdzg9h4b01bpla0dk7geg7d9"
       clientId={"client-WY6NzgUBfSSaQptm2ky6CqDoQiWMkY5X4pYTsFMfFtp6H"}
       config={{
-        // Create embedded wallets for users who don't have a wallet
-        embeddedWallets: {
-          ethereum: {
-            createOnLogin: "users-without-wallets",
-          },
+        loginMethods: ["wallet"],
+        appearance: {
+          showWalletLoginFirst: true,
         },
       }}
     >

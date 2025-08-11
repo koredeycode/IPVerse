@@ -219,10 +219,7 @@ const Navbar = () => {
           rel="noopener noreferrer"
           className="text-sm w-full"
         >
-          <button
-            onClick={disconnect}
-            className={`${buttonSecondary} w-full text-sm`}
-          >
+          <button className={`${buttonSecondary} w-full text-sm`}>
             Claim Faucet
           </button>
         </Link>
@@ -278,6 +275,8 @@ const Navbar = () => {
 
                 <button
                   onClick={() => {
+                    disconnect();
+                    logout();
                     localStorage.clear();
                     router.push("/signin");
                   }}
