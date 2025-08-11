@@ -11,6 +11,7 @@ interface MetadataAttribute {
 
 interface ContentViewProps {
   title: string;
+  description: string;
   creator: string;
   date: string;
   type: string;
@@ -20,10 +21,11 @@ interface ContentViewProps {
 
 const ContentView = ({
   title,
+  description,
   creator,
   date = "July 15, 2024",
   type,
-  fileUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
+  fileUrl,
   // fileUrl = "https://raw.githubusercontent.com/koredeycode/IPVerse/refs/heads/main/README.md",
   attributes = [
     { trait_type: "Style", value: "Surreal" },
@@ -115,6 +117,12 @@ const ContentView = ({
           ) : (
             <>{file && <ContentPreview file={file} />}</>
           )}
+        </div>
+        <div className="mb-6">
+          <h3 className="typography_h2 border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary">
+            Description
+          </h3>
+          <p className="pt-4">{description}</p>
         </div>
         <div className="mb-6">
           <h3 className="typography_h2 border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary">

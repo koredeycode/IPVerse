@@ -16,6 +16,7 @@ interface MetadataAttribute {
 
 interface ContentData {
   name: string;
+  description: string;
   creator: string;
   date: string;
   type: string;
@@ -53,6 +54,23 @@ const getFileUrl = async (id: string): Promise<string> => {
       throw new Error("Can't get fileUrl");
     }
     return fileUrl;
+  } catch (error) {
+    throw error instanceof Error ? error : new Error("An error occurred");
+  }
+};
+
+const getFileType = async (id: string): Promise<string> => {
+  try {
+    const APIResponse = await fetch(`/api/contents/${id}/type`);
+    if (!APIResponse.ok) {
+      throw new Error("Failed to fetch content by ID");
+    }
+    const APIData = await APIResponse.json();
+    const type = APIData.type;
+    if (!type) {
+      throw new Error("Can't get file type");
+    }
+    return type;
   } catch (error) {
     throw error instanceof Error ? error : new Error("An error occurred");
   }
@@ -96,15 +114,17 @@ const ContentPage = () => {
           setAccess(true);
           const tokenUri = await origin?.tokenURI(tokenId);
           const fileUrl = await getFileUrl(id);
+          const type = await getFileType(id);
 
           const response = await fetch(tokenUri);
           const data = await response.json();
 
-          setContentData({ ...data, fileUrl });
+          setContentData({ ...data, fileUrl, type });
         } else {
           setAccess(false);
           setContentData({
             name: "Dummy",
+            description: "dummy",
             creator: "dummy",
             date: "today",
             type: "image",
@@ -177,9 +197,10 @@ const ContentPage = () => {
   return access ? (
     <ContentView
       title={contentData.name}
+      description={contentData.description}
+      type={contentData.type}
       creator={contentData.creator}
       date={contentData.date}
-      type={contentData.type}
       fileUrl={contentData.fileUrl}
       attributes={contentData.attributes}
     />
