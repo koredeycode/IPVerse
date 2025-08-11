@@ -1,5 +1,5 @@
 import { getLoggedInUserTwitter } from "@/lib/utils";
-import SidebarNavLink from "./SidebarNavLink";
+import SidebarNavLink from "./NavLink";
 
 const Sidebar = () => {
   return (

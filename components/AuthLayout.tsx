@@ -61,7 +61,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   // Authenticated state: render sidebar, navbar, and children
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      {/* <Sidebar /> */}
       <div className="flex-1">
         <Navbar />
         <main className="flex-1 p-4 md:p-8">{children}</main>
