@@ -31,7 +31,7 @@ const FilterButton = ({
   );
 };
 
-type MediaItem = {
+type Content = {
   id: string;
   type: "video" | "audio" | "image" | "text";
   title: string;
@@ -48,7 +48,7 @@ const GalleryItem = ({
   description,
   image_url,
   type,
-}: MediaItem) => {
+}: Content) => {
   return (
     <div className="flex flex-col gap-3 group bg-cardBg rounded-lg">
       <Link

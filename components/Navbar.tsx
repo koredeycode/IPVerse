@@ -318,6 +318,14 @@ const Navbar = () => {
                     <div className="flex flex-col gap-4">
                       <button
                         onClick={() => {
+                          router.push(`/profile/${getLoggedInUserTwitter()}`);
+                        }}
+                        className={`${buttonSecondary} w-full text-sm`}
+                      >
+                        View Profile
+                      </button>
+                      <button
+                        onClick={() => {
                           disconnect();
                           logout();
                           localStorage.clear();

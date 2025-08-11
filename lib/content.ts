@@ -114,3 +114,27 @@ export const fromTotalSeconds = (
   // Fallback — return in seconds
   return { duration: totalSeconds, unit: "Seconds" };
 };
+
+export function getExpiryInfo(totalSeconds: number, subscriptionDate: string) {
+  const startDate = new Date(subscriptionDate);
+  const expiryDate = new Date(startDate.getTime() + totalSeconds * 1000);
+
+  const now = new Date();
+  const diffMs = expiryDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  const expiresInText =
+    diffDays <= 0 ? "Expired" : `in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
+
+  // Format expiry date (e.g., Aug 20, 2025)
+  const formattedExpiry = expiryDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  return {
+    expiresIn: expiresInText,
+    expiryDate: formattedExpiry,
+  };
+}

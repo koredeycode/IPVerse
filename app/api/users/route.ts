@@ -35,11 +35,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const wallet = searchParams.get("wallet");
-    // const creator = searchParams.get("creator");
-    const queries = [Query.limit(10)];
+    const twitter = searchParams.get("twitter");
+    const queries = [Query.limit(1)];
 
     if (wallet) queries.push(Query.equal("wallet", [wallet]));
-    // if (creator) queries.push(Query.equal("creator", creator));
+    if (twitter) queries.push(Query.equal("twitter", [twitter]));
 
     const users = await databases.listDocuments(
       databaseId,

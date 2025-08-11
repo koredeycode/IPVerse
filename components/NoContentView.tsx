@@ -1,5 +1,5 @@
 "use client";
-import { fromTotalSeconds } from "@/lib/content";
+import { fromTotalSeconds, getTotalSeconds } from "@/lib/content";
 import { getLoggedInUserTwitter } from "@/lib/utils";
 import { useAuth } from "@campnetwork/origin/react";
 import { useRouter } from "next/navigation";
@@ -31,10 +31,10 @@ type LicenseTerms = {
   paymentToken: Address;
 };
 const NoContentView: React.FC<NoContentViewProps> = ({
-  title = "Restricted Content",
-  creator = "@ipVerse",
-  date = "July 15, 2024",
-  type = "Art",
+  title,
+  creator,
+  date,
+  type,
   fileUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
   // subscriptionPrice = "$5/month",
   // subscriptionDetails = "Billed monthly. Cancel anytime.",
@@ -69,8 +69,6 @@ const NoContentView: React.FC<NoContentViewProps> = ({
     try {
       setIsSubscribing(true);
       if (tokenId) await auth.origin?.buyAccessSmart(tokenId, 1);
-      toast.success("Subscribed successfully");
-      setIsNowSubscribed(true);
 
       // send update to the appwrite database
       const APIResponse = await fetch(`/api/subscriptions`, {
@@ -80,10 +78,16 @@ const NoContentView: React.FC<NoContentViewProps> = ({
           subscriber: getLoggedInUserTwitter() || "@ipverse",
           contentId,
           price,
-          duration,
-          contentTitle: title,
+          duration: getTotalSeconds(
+            duration?.duration ?? 0,
+            duration?.unit || ""
+          ),
+          contentTitle: title ?? "An Ipverse Content",
         }),
       });
+
+      toast.success("Subscribed successfully");
+      setIsNowSubscribed(true);
       // router.refresh();
     } catch (error) {
       console.error("Subscription failed:", error);
