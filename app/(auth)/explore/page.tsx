@@ -47,17 +47,18 @@ const GalleryItem = ({
   creator,
   description,
   image_url,
+  type,
 }: MediaItem) => {
   return (
-    <div className="flex flex-col gap-3 group">
+    <div className="flex flex-col gap-3 group bg-cardBg rounded-lg">
       <Link
-        className="w-full bg-center bg-no-repeat aspect-square bg-contain rounded-lg overflow-hidden relative"
+        className="w-[256px] h-[320px] bg-center bg-no-repeat aspect-square bg-contain rounded-lg overflow-hidden relative self-center"
         href={`/content/${id}`}
         style={{
           backgroundImage: `url('${image_url}')`,
         }}
       >
-        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-all duration-300 flex items-center justify-center">
+        <div className=" absolute inset-0 bg-black opacity-0 group-hover:opacity-75 transition-all duration-300 flex items-center justify-center">
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white">
             <svg
               fill="currentColor"
@@ -71,10 +72,12 @@ const GalleryItem = ({
           </div>
         </div>
       </Link>
-      <div>
+      <div className="p-4">
         <h3 className="font-semibold truncate">{title}</h3>
-        <p className="text-textSecondary text-sm">by @{creator}</p>
-        <p className="text-textSecondary text-sm mt-1">{description}</p>
+        <div className="flex justify-between">
+          <p className="text-textSecondary text-sm">by @{creator}</p>
+          <p className="text-textSecondary text-sm">{type}</p>
+        </div>
       </div>
     </div>
   );

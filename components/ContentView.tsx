@@ -23,7 +23,7 @@ const ContentView = ({
   title,
   description,
   creator,
-  date = "July 15, 2024",
+  date,
   type,
   fileUrl,
   // fileUrl = "https://raw.githubusercontent.com/koredeycode/IPVerse/refs/heads/main/README.md",

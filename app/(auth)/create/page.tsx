@@ -64,6 +64,7 @@ export default function Create() {
   });
 
   async function handleGenerateImage() {
+    setLoadingState("imageGenerating");
     if (!mintData.title) {
       toast.error("Missing content title");
       return;
@@ -84,6 +85,7 @@ export default function Create() {
 
     setContentId(id);
     setShowFileCard(true);
+    setLoadingState("none");
   }
 
   async function handleUploadImage() {
@@ -142,7 +144,7 @@ export default function Create() {
         }),
       });
 
-      toast.success("Uploaded to ipVerse successfully");
+      toast.success("IPVerse content updated successfully");
       setStepOneComplete(true);
     } catch (error) {
       console.error("IPFS upload error:", error);
@@ -199,6 +201,13 @@ export default function Create() {
       paymentToken: "0x0000000000000000000000000000000000000000" as Address,
     } as LicenseTerms;
 
+    const date = new Date();
+    const formatted = date.toLocaleDateString("en-US", {
+      month: "long", // full month name
+      day: "numeric", // day number
+      year: "numeric", // full year
+    });
+
     const metadata = {
       title: "An IPVerse IP",
       name: mintData.title,
@@ -206,7 +215,7 @@ export default function Create() {
       image: mintData.imageUrl,
       // file: mintData.fileUrl,
       attributes: mintData.attributes,
-      // date
+      date: formatted,
       creator: getLoggedInUserTwitter() || "@ipVerse",
     };
 
@@ -633,11 +642,35 @@ export default function Create() {
                 <div className="flex gap-4">
                   {!contentId && (
                     <button
-                      className={`${buttonSecondary} w-full md:w-auto`}
+                      className={`${buttonSecondary} flex justify-center w-full md:w-auto`}
                       onClick={handleGenerateImage}
                       // disabled={!mintData.title}
                     >
-                      Generate IpNFT
+                      {loadingState === "imageGenerating" && (
+                        <span>
+                          <svg
+                            className="animate-spin h-5 w-5 "
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        </span>
+                      )}
+                      <span>Generate IpNFT</span>
                     </button>
                   )}
 

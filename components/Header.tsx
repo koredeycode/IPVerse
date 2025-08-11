@@ -4,7 +4,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-ipv-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center whitespace-nowrap border-b border-solid border-white/10 py-4">
+        <div className="flex items-center justify-center whitespace-nowrap border-b border-solid border-white/10 py-2">
           <div className="flex items-center gap-3 text-white">
             <Logo />
           </div>

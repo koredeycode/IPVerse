@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { typographyBody } from "./styles";
 
@@ -7,12 +8,6 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-center md:justify-start">
-            {/* <a className={`${typographyBody} hover:text-white`} href="#">
-              About
-            </a>
-            <a className={`${typographyBody} hover:text-white`} href="#">
-              Contact
-            </a> */}
             <Link className={`${typographyBody} hover:text-white`} href="#">
               Terms of Service
             </Link>
@@ -20,12 +15,22 @@ const Footer = () => {
               Privacy Policy
             </Link>
           </div>
-          <p className={`${typographyBody} text-center md:text-right`}>
-            © 2025 IPVerse. All rights reserved.
-          </p>
-          <p className={`${typographyBody} text-center md:text-right`}>
-            Powered by camp network
-          </p>
+          <div className={`${typographyBody} text-center md:text-right`}>
+            <p>© {new Date().getFullYear()} IPVerse.</p>
+            <p>All rights reserved.</p>
+          </div>
+          <div className="bg-cardBg p-4 flex gap-2 items-center rounded">
+            <Image
+              alt="camp logo"
+              src={"/camp.svg"}
+              width={10}
+              height={10}
+              className="h-8 w-8"
+            />
+            <p className={`${typographyBody} text-center md:text-right`}>
+              Powered by Camp Network
+            </p>
+          </div>
         </div>
       </div>
     </footer>

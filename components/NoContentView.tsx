@@ -1,11 +1,12 @@
 "use client";
 import { fromTotalSeconds } from "@/lib/content";
+import { getLoggedInUserTwitter } from "@/lib/utils";
 import { useAuth } from "@campnetwork/origin/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { buttonPrimary } from "./styles";
+import { buttonPrimary, typographyBody, typographyH2 } from "./styles";
 
 interface MetadataAttribute {
   trait_type: string;
@@ -21,6 +22,7 @@ interface NoContentViewProps {
   subscriptionPrice?: string;
   // subscriptionDetails?: string;
   tokenId?: bigint;
+  contentId: string;
 }
 type LicenseTerms = {
   price: bigint;
@@ -37,9 +39,11 @@ const NoContentView: React.FC<NoContentViewProps> = ({
   // subscriptionPrice = "$5/month",
   // subscriptionDetails = "Billed monthly. Cancel anytime.",
   tokenId,
+  contentId,
 }) => {
   const [price, setPrice] = useState(0);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isNowSubscribed, setIsNowSubscribed] = useState(false);
   const [duration, setDuration] = useState<{
     duration: number;
     unit: string;
@@ -66,16 +70,21 @@ const NoContentView: React.FC<NoContentViewProps> = ({
       setIsSubscribing(true);
       if (tokenId) await auth.origin?.buyAccessSmart(tokenId, 1);
       toast.success("Subscribed successfully");
+      setIsNowSubscribed(true);
 
-      //send update to the appwrite database
-      // const APIResponse = await fetch(`/api/subscriptions`, {
-      //         method: "POST",
-      //         headers: { "Content-Type": "application/json" },
-      //         body: JSON.stringify({
-      //           subscriber, id
-      //         }),
-      //       });
-      router.refresh();
+      // send update to the appwrite database
+      const APIResponse = await fetch(`/api/subscriptions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscriber: getLoggedInUserTwitter() || "@ipverse",
+          contentId,
+          price,
+          duration,
+          contentTitle: title,
+        }),
+      });
+      // router.refresh();
     } catch (error) {
       console.error("Subscription failed:", error);
 
@@ -172,25 +181,64 @@ const NoContentView: React.FC<NoContentViewProps> = ({
             >
               <path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208Z"></path>
             </svg>
-            <h2 className="typography_h2 text-textPrimary">
+            <h2 className={`${typographyH2} text-textPrimary`}>
               Unlock Exclusive Content
             </h2>
-            <p className="typography_body text-textSecondary mb-6">
-              Subscribe to {creator} to get access to this exclusive content.
+            <p className={`${typographyBody} text-textSecondary mb-6`}>
+              Subscribe to get access to this exclusive content.
             </p>
-            <div className="mb-4 text-left">
+            <div className="mb-4 text-center">
               <p className="text-lg font-bold text-textPrimary">
-                Subscription: {price} CAMP for {duration?.duration}{" "}
-                {duration?.unit}
+                At {price} CAMP for {duration?.duration} {duration?.unit}
               </p>
-              <p className="text-sm text-textSecondary">hi</p>
             </div>
             <button
               onClick={handleSubscription}
-              className={`${buttonPrimary} w-full max-w-xs`}
+              className={`${buttonPrimary} flex gap-2 justify-center w-full max-w-xs`}
+              disabled={isNowSubscribed}
             >
-              {isSubscribing ? "Subscribing" : "Subscribe Now"}
+              {isSubscribing && (
+                <span>
+                  <svg
+                    className="animate-spin h-5 w-5 "
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </span>
+              )}
+              <span>{isSubscribing ? "Subscribing" : "Subscribe Now"}</span>
             </button>
+
+            {isNowSubscribed && (
+              <div className="mt-4">
+                <p className={`${typographyBody} text-textSecondary mb-4`}>
+                  Subscription successful. Refresh to view content.
+                </p>
+                <button
+                  className={`${buttonPrimary} w-full`}
+                  onClick={() => {
+                    window.location.reload();
+                  }}
+                >
+                  Refresh
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

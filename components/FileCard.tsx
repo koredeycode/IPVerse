@@ -64,7 +64,7 @@ export default function FileCard({
       {/* QR Footer */}
       <div className="flex justify-between items-end gap-2 p-3 border-t border-gray-200 bg-gray-50">
         {/* Branding */}
-        <div className="flex items-center justify-center text-ipv-primary">
+        <div className="flex items-center justify-center text-blue-500">
           © Ipverse {new Date().getFullYear()}
         </div>
         {contentId && (

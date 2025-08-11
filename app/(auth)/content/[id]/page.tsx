@@ -121,16 +121,16 @@ const ContentPage = () => {
 
           setContentData({ ...data, fileUrl, type });
         } else {
+          const tokenUri = await origin?.tokenURI(tokenId);
+          const response = await fetch(tokenUri);
+          const data = await response.json();
+          const type = await getFileType(id);
           setAccess(false);
           setContentData({
-            name: "Dummy",
-            description: "dummy",
-            creator: "dummy",
-            date: "today",
-            type: "image",
+            ...data,
             fileUrl:
               "https://lh3.googleusercontent.com/aida-public/AB6AXuAVQU8-ogQB5kqco8s8UB83zu1ip4hxsKuEPzBdc3vbgyjzZ2mzOHe7j9vRuQSBXpvPuyC0zx-X2tnTW_NhH0fLweZOT5Rd81Uj9JrXYgDaViNPNiSazwJ1rLiPC6vVTyV0eM0k3f_ENyhD8uWumtMR5Z1UDrJXhXeS1NWk6fJDZKvuiU33DRro7vZUbJ0I9H_rK6f3xxXlxyefYmDkKpux68ai5CE7BZL4PWvRwyjrkW53OELUKPnczpxRi_H1LSHMcsLF1KHhFwI",
-            attributes: [],
+            type,
           });
         }
       } catch (err) {
@@ -212,6 +212,7 @@ const ContentPage = () => {
       type={contentData.type}
       fileUrl={contentData.fileUrl}
       tokenId={tokenId}
+      contentId={id}
       // subscriptionPrice={contentData.subscriptionPrice}
       // subscriptionDetails={contentData.subscriptionDetails}
     />

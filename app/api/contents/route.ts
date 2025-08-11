@@ -33,11 +33,14 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    // const { searchParams } = new URL(request.url);
-    // const type = searchParams.get("type");
-    // const creator = searchParams.get("creator");
     const queries = [Query.limit(100)];
     queries.push(Query.isNotNull("type"));
+    const { searchParams } = new URL(request.url);
+    // const type = searchParams.get("type");
+    const creator = searchParams.get("creator");
+    if (creator) {
+      queries.push(Query.equal("creator", [creator]));
+    }
 
     // if (type) queries.push(Query.equal("type", type));
     // if (creator) queries.push(Query.equal("creator", creator));
@@ -52,8 +55,8 @@ export async function GET(request: Request) {
     const filtered = contents.documents.map((doc) => ({
       id: doc.$id,
       title: doc.title,
-      creator: doc.creator,
       description: doc.description,
+      creator: doc.creator,
       imageUrl: doc.imageUrl,
       type: doc.type,
       // add any other fields you want

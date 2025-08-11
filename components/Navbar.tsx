@@ -188,7 +188,7 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-ipv-background/80 backdrop-blur-sm">
       <div className="px-4">
-        <div className="flex justify-between items-center border-b border-solid border-white/10 py-4">
+        <div className="flex justify-between items-center border-b border-solid border-white/10 py-2">
           {/*Logo*/}
           <div className="flex items-center gap-3">
             {/* <div className="size-8 bg-yellow-100">
@@ -202,40 +202,39 @@ const Navbar = () => {
             </svg>
           </div> */}
             <Logo />
-          </div>
-          {/* Navigation */}
-          <nav className="flex gap-2">
-            <NavLink
-              href="/explore"
-              label="Explore"
-              icon={
-                <svg
-                  fill="currentColor"
-                  height="24"
-                  viewBox="0 0 256 256"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM172.42,72.84l-64,32a8.05,8.05,0,0,0-3.58,3.58l-32,64A8,8,0,0,0,80,184a8.1,8.1,0,0,0,3.58-.84l64-32a8.05,8.05,0,0,0,3.58-3.58l32-64a8,8,0,0,0-10.74-10.74ZM138,138,97.89,158.11,118,118l40.15-20.07Z"></path>
-                </svg>
-              }
-            />
-            <NavLink
-              href="/create"
-              label="Create"
-              icon={
-                <svg
-                  fill="currentColor"
-                  height="24"
-                  viewBox="0 0 256 256"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-                </svg>
-              }
-            />
-            {/* <SidebarNavLink
+            {/* Navigation */}
+            <nav className="flex gap-2">
+              <NavLink
+                href="/explore"
+                label="Explore"
+                icon={
+                  <svg
+                    fill="currentColor"
+                    height="24"
+                    viewBox="0 0 256 256"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM172.42,72.84l-64,32a8.05,8.05,0,0,0-3.58,3.58l-32,64A8,8,0,0,0,80,184a8.1,8.1,0,0,0,3.58-.84l64-32a8.05,8.05,0,0,0,3.58-3.58l32-64a8,8,0,0,0-10.74-10.74ZM138,138,97.89,158.11,118,118l40.15-20.07Z"></path>
+                  </svg>
+                }
+              />
+              <NavLink
+                href="/create"
+                label="Create"
+                icon={
+                  <svg
+                    fill="currentColor"
+                    height="24"
+                    viewBox="0 0 256 256"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+                  </svg>
+                }
+              />
+              {/* <SidebarNavLink
                   href="/analytics"
                   label="Analytics"
                   icon={
@@ -250,7 +249,8 @@ const Navbar = () => {
                     </svg>
                   }
                 /> */}
-          </nav>
+            </nav>
+          </div>
           <div className="flex gap-4">
             <div className="flex items-center justify-between gap-4">
               <Link
