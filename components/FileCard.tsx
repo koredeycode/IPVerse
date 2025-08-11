@@ -75,7 +75,7 @@ export default function FileCard({
           </svg>
         </div>
         <QRCodeSVG
-          value={`http://localhost:3000/content/${contentId}`}
+          value={`${process.env.NEXT_PUBLIC_IPVERSE_APP_URL}/content/${contentId}`}
           size={48}
         />
       </div>

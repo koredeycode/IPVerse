@@ -223,6 +223,16 @@ const Navbar = () => {
             Claim Faucet
           </button>
         </Link>
+        <div>
+          <button
+            onClick={() => {
+              openCampModal();
+            }}
+            className={`${buttonSecondary} w-full text-sm`}
+          >
+            Origin
+          </button>
+        </div>
       </div>
 
       {/* ✅ closes .flex.items-center gap-4 */}
@@ -264,15 +274,6 @@ const Navbar = () => {
               </div>
               <div className="border-t border-[var(--input-border)] my-4"></div> */}
               <div className="flex flex-col gap-4">
-                <button
-                  onClick={() => {
-                    openCampModal();
-                  }}
-                  className={`${buttonSecondary} w-full text-sm`}
-                >
-                  View Origin
-                </button>
-
                 <button
                   onClick={() => {
                     disconnect();

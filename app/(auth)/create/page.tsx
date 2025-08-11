@@ -13,6 +13,8 @@ import { getLoggedInUserTwitter } from "@/lib/utils";
 import { uploadSchema } from "@/schemas/contentSchemas";
 import { useAuth } from "@campnetwork/origin/react";
 import { useActiveWallet } from "@privy-io/react-auth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Address } from "viem/accounts";
@@ -40,11 +42,13 @@ export default function Create() {
 
   const [stepOneComplete, setStepOneComplete] = useState(false);
   const [stepTwoComplete, setStepTwoComplete] = useState(false);
+  const [isDone, setIsDone] = useState(false);
 
   const [showFileCard, setShowFileCard] = useState(false);
   const [loadingState, setLoadingState] = useState<string>("none");
 
   const [contentId, setContentId] = useState<any>();
+  const router = useRouter();
 
   const [mintData, setMintData] = useState({
     title: "",
@@ -83,6 +87,20 @@ export default function Create() {
       const formData = new FormData();
       formData.append("file", ipfsFile);
 
+      const APIResponse = await fetch("/api/contents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          creator: getLoggedInUserTwitter() || "@ipVerse",
+        }),
+      });
+
+      toast.success("New IPVerse content created successfully");
+
+      const { $id: id } = await APIResponse.json();
+
+      setContentId(id);
+
       const response = await fetch(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
         {
@@ -108,20 +126,16 @@ export default function Create() {
         description: `IPFS URL: ${imageUrl}`,
       });
 
-      const APIResponse = await fetch("/api/contents", {
-        method: "POST",
+      const APIResponse2 = await fetch(`/api/contents/${contentId}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageUrl,
         }),
       });
 
-      const { $id: id } = await APIResponse.json();
-
-      setContentId(id);
-      setStepOneComplete(true);
-
       toast.success("Uploaded to ipVerse successfully");
+      setStepOneComplete(true);
     } catch (error) {
       console.error("IPFS upload error:", error);
       toast.error("Failed to upload file to IPFS", {
@@ -207,7 +221,6 @@ export default function Create() {
           tokenId,
           title: mintData.title,
           description: mintData.description,
-          creator: getLoggedInUserTwitter() || "@ipVerse",
         }),
       });
       toast.success("Ipverse content updated successfully");
@@ -310,6 +323,7 @@ export default function Create() {
           type: getFileType(file.name),
         }),
       });
+      setIsDone(true);
       toast.success("Ipverse content updated successfully");
     } catch (error) {
       console.error("IPFS upload error:", error);
@@ -363,7 +377,7 @@ export default function Create() {
       </h1>
 
       {/* Step 1: Mint */}
-      {!stepOneComplete && (
+      {!stepTwoComplete && (
         <div className={`card`}>
           <h2
             className={`${typographyH2} border-b border-b-gray-700 pb-4 mb-6`}
@@ -597,43 +611,98 @@ export default function Create() {
             )}
 
             <div className="flex items-center justify-between pt-4">
-              <div className="flex justify-start gap-4">
-                <button
-                  className={`${buttonSecondary} w-full md:w-auto`}
-                  onClick={() => {
-                    console.log("generating");
-                    console.log(showFileCard);
-                    setShowFileCard(true);
-                    console.log(showFileCard);
-                  }}
-                  disabled={!mintData.title}
-                >
-                  Generate IpNFT
-                </button>
-
-                {mintFile && (
+              {!stepOneComplete && (
+                <div className="flex gap-4">
                   <button
-                    className={`${buttonPrimary} w-full md:w-auto`}
-                    onClick={handleUploadImage}
-                    disabled={!mintFile}
+                    className={`${buttonSecondary} w-full md:w-auto`}
+                    onClick={() => {
+                      if (!mintData.title) {
+                        toast.error("Missing content title");
+                        return;
+                      }
+                      setShowFileCard(true);
+                    }}
+                    // disabled={!mintData.title}
                   >
-                    {loadingState == "imageUploading"
-                      ? "Uploading IpNFT"
-                      : "Upload IpNFT"}
+                    Generate IpNFT
                   </button>
-                )}
-                {stepOneComplete && (
-                  <div>
+
+                  {mintFile && (
                     <button
-                      className={`${buttonPrimary} w-full md:w-auto`}
-                      onClick={handleMintSubmit}
-                      disabled={!stepOneComplete}
+                      className={`${buttonPrimary} flex w-full md:w-auto`}
+                      onClick={handleUploadImage}
+                      disabled={!mintFile}
                     >
-                      {loadingState == "minting" ? "Minting" : " Mint IP"}
+                      {loadingState === "imageUploading" && (
+                        <span>
+                          <svg
+                            className="animate-spin h-5 w-5 "
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        </span>
+                      )}
+                      <span>
+                        {loadingState == "imageUploading"
+                          ? "Uploading IpNFT"
+                          : "Upload IpNFT"}
+                      </span>
                     </button>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
+              {stepOneComplete && (
+                <div>
+                  <button
+                    className={`${buttonPrimary} flex w-full md:w-auto`}
+                    onClick={handleMintSubmit}
+                    disabled={!stepOneComplete}
+                  >
+                    {loadingState === "minting" && (
+                      <span>
+                        <svg
+                          className="animate-spin h-5 w-5 "
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      </span>
+                    )}
+                    <span>
+                      {loadingState == "minting" ? "Minting" : " Mint IP"}
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -699,40 +768,57 @@ export default function Create() {
                   />
                 </label>
               </div>
-              <button
-                className={`${buttonPrimary} w-full mt-4`}
-                onClick={handleUploadFile}
-                disabled={!stepTwoComplete}
-              >
-                <svg
-                  className="animate-spin h-8 w-8 "
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+              {!isDone && (
+                <button
+                  className={`${buttonPrimary} flex justify-center gap-4 w-full mt-4`}
+                  onClick={handleUploadFile}
+                  disabled={!stepTwoComplete}
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                {loadingState === "fileUploading"
-                  ? "Uploading File"
-                  : "Upload File"}
-              </button>
+                  {loadingState === "fileUploading" && (
+                    <span>
+                      <svg
+                        className="animate-spin h-5 w-5 "
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    </span>
+                  )}
+
+                  <span>
+                    {loadingState === "fileUploading"
+                      ? "Uploading File"
+                      : "Upload File"}
+                  </span>
+                </button>
+              )}
             </div>
             <div className="bg-ipv-background rounded-lg p-2">
               <ContentPreview file={file} />
             </div>
           </div>
+        </div>
+      )}
+      {isDone && (
+        <div className="card text-center">
+          <h3 className="text-xl  mb-4">Content successfully created!</h3>
+          <Link className={`${buttonPrimary}`} href={`/content/${contentId}`}>
+            View Content
+          </Link>
         </div>
       )}
     </div>

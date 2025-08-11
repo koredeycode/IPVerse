@@ -5,9 +5,9 @@ import { Query } from "node-appwrite";
 
 export async function POST(request: Request) {
   try {
-    const { imageUrl } = await request.json();
+    const { creator } = await request.json();
 
-    if (!imageUrl) {
+    if (!creator) {
       return NextResponse.json(
         { error: "Missing or invalid file" },
         { status: 400 }
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       databaseId,
       contentCollectionId,
       ID.unique(),
-      { imageUrl }
+      { creator }
     );
     return NextResponse.json(content);
   } catch (error) {
