@@ -26,7 +26,7 @@ interface ContentData {
 // Mock API function to fetch data (replace with your actual API or blockchain logic)
 const getTokenId = async (id: string): Promise<bigint> => {
   try {
-    const APIResponse = await fetch(`/api/contents/${id}`);
+    const APIResponse = await fetch(`/api/contents/${id}/tokenId`);
     if (!APIResponse.ok) {
       throw new Error("Failed to fetch content by ID");
     }

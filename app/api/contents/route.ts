@@ -20,7 +20,8 @@ export async function POST(request: Request) {
       ID.unique(),
       { creator }
     );
-    return NextResponse.json(content);
+    const { $id: id } = content;
+    return NextResponse.json({ id });
   } catch (error) {
     console.log(error);
     return NextResponse.json(
@@ -32,12 +33,13 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type");
+    // const { searchParams } = new URL(request.url);
+    // const type = searchParams.get("type");
     // const creator = searchParams.get("creator");
-    const queries = [Query.limit(10)];
+    const queries = [Query.limit(100)];
+    queries.push(Query.isNotNull("type"));
 
-    if (type) queries.push(Query.equal("type", type));
+    // if (type) queries.push(Query.equal("type", type));
     // if (creator) queries.push(Query.equal("creator", creator));
 
     const contents = await databases.listDocuments(
@@ -45,7 +47,19 @@ export async function GET(request: Request) {
       contentCollectionId,
       queries
     );
-    return NextResponse.json(contents.documents);
+
+    // Only send specific fields
+    const filtered = contents.documents.map((doc) => ({
+      id: doc.$id,
+      title: doc.title,
+      creator: doc.creator,
+      description: doc.description,
+      imageUrl: doc.imageUrl,
+      type: doc.type,
+      // add any other fields you want
+    }));
+
+    return NextResponse.json(filtered);
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to query content" },

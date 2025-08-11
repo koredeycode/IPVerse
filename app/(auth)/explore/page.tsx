@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const fileTypes = [
   { label: "All", value: "all" },
@@ -30,7 +32,7 @@ const FilterButton = ({
 };
 
 type MediaItem = {
-  id: number;
+  id: string;
   type: "video" | "audio" | "image" | "text";
   title: string;
   creator: string;
@@ -39,14 +41,18 @@ type MediaItem = {
   // href: string;
 };
 
-const GalleryItem = ({ title, creator, description, image_url }: MediaItem) => {
-  console.log("galllery");
-  console.log(image_url);
+const GalleryItem = ({
+  id,
+  title,
+  creator,
+  description,
+  image_url,
+}: MediaItem) => {
   return (
     <div className="flex flex-col gap-3 group">
       <Link
-        className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg overflow-hidden relative"
-        href="/content/6897edbd0011ce44858d"
+        className="w-full bg-center bg-no-repeat aspect-square bg-contain rounded-lg overflow-hidden relative"
+        href={`/content/${id}`}
         style={{
           backgroundImage: `url('${image_url}')`,
         }}
@@ -155,6 +161,17 @@ export const NavButton = ({
 };
 
 const Explore = () => {
+  const [contents, setContents] = useState([]);
+  useEffect(() => {
+    const loadContents = async () => {
+      const response = await fetch("/api/contents");
+      const data = await response.json();
+
+      setContents(data);
+    };
+    loadContents();
+  }, []);
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -163,19 +180,17 @@ const Explore = () => {
         ))}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {sampleData.map(
-          ({ id, type, creator, title, description, image_url }) => (
-            <GalleryItem
-              key={id}
-              id={id}
-              type={type}
-              creator={creator}
-              title={title}
-              description={description}
-              image_url={image_url}
-            />
-          )
-        )}
+        {contents.map(({ id, type, creator, title, description, imageUrl }) => (
+          <GalleryItem
+            key={id}
+            id={id}
+            type={type}
+            creator={creator}
+            title={title}
+            description={description}
+            image_url={imageUrl}
+          />
+        ))}
       </div>
       <div className="flex items-center justify-center mt-8">
         <a

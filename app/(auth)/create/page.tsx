@@ -97,7 +97,9 @@ export default function Create() {
 
       toast.success("New IPVerse content created successfully");
 
-      const { $id: id } = await APIResponse.json();
+      const { id } = await APIResponse.json();
+
+      console.log("new content id ", id);
 
       setContentId(id);
 
@@ -126,7 +128,7 @@ export default function Create() {
         description: `IPFS URL: ${imageUrl}`,
       });
 
-      const APIResponse2 = await fetch(`/api/contents/${contentId}`, {
+      const APIResponse2 = await fetch(`/api/contents/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -577,6 +579,7 @@ export default function Create() {
                       id="duration"
                       placeholder="Duration"
                       type="number"
+                      step="1"
                       value={mintData.duration}
                       onChange={(e) =>
                         setMintData({ ...mintData, duration: e.target.value })
