@@ -80,62 +80,62 @@ const GalleryItem = ({
   );
 };
 
-const sampleData: MediaItem[] = [
-  {
-    id: 1,
-    type: "video",
-    creator: "sophia_carter",
-    title: "Cosmic Dreamscape: A Journey Through a Digital Universe",
-    description: "A vibrant piece of digital art.",
-    image_url:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAq0JsfLoE2N7rIUHLPFVVNaAupdnydUlTynOP9CFh6s3ur06ycYqWk56aVfZU1qF_crUYD2TUf4mM0RvSZ-vdFwbgW3RebxWHkpcoRN4r2a-yEny4lmtZ8uC3w-JfalPQh_HWY0Hr81Zp2dRn6O3K5fa2HGRq2_G_9AtuLrSjD5eZS9dBdNTnOguRb7os62MflrVtGHcxSelBZmskcDWW2TTQSC9d55CKboD1ouR6Bs59BpZ-uT9mcNkSyPm_GFGVogecQzgD9F0I",
-  },
-  {
-    id: 2,
-    type: "audio",
-    creator: "ethan_bennet",
-    title: "Synthwave Sonata",
-    description: "An electrifying musical piece.",
-    image_url:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCB_3gnrsFf1qeEmfOb4NEZCK8NUxxbE-b_NgSJrBjB41M8Y5oKrwUCoYmaIlCU4PfK_rWMlfGKABscMQ3x2aH-2Vekb2UD7KY1gyBWIqfMDOJ-6xNG4sSsUTHSEYKew5IFzTogkj7Zb_vTxA8ZQIZIlNlpFH_dKufrQ56_WSGz-3kbzHhZISC57NGds0M5iZhNG5EtvmBrmNoMPa45BPloBxc2qCHa-TenRbk5THHwIVFTF5ySoHi160mFJxfhwuruWSd6bvURYRc",
-  },
-  {
-    id: 3,
-    type: "image",
-    creator: "olivia_hayes",
-    title: "Urban Reflections",
-    description: "A stunning series of photographs.",
-    image_url:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCOS7_K_wMtn5d3O8n1BzLd-Cfaek6Wsmc2XurG9k7pFeo9woU2D0wTF7gghQXUqZd2R4CkqasscFAvgYI0fUby7wBYmnGw1OY1QNXRQtaBZxIGREi5TwXNnC7-uuRCuaWZL7W13rBA6RaKXjdER-7CCQ8skltJ0H-pU5m8ruW4vxENgaRIHWTmaeG7Vy1U-DtRVMUZEvkiZnmLX77UTqLN_u7vFB3sNlOd3A8LAmoZ9L-0bX1schQOUxw3gdnHykDMWdD3GvbP22E",
-  },
-  {
-    id: 4,
-    type: "video",
-    creator: "noah_parker",
-    title: "Cybernetic Sculptures",
-    description: "A collection of futuristic 3D models.",
-    image_url:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC5BQH1Haj_JI409mizi1F1R1JEislFOBtn0NoBFwdj6jcqSEuq_TL3focmiG6N-t4VIpNMSdP9HCxNqWGvjJzsrkRYzerc7cKKKInVFxr6iR8hRVRqaED7C-HY4iffev88LFVz_wgpf3n1B01lUAozfCxHtLR5vTlZrzf-Qm_oEGMS08-wfglu54vlbM4KO9pCpDzy1iDjomnBYb7Vxtq465Pcskf0R1wZ4He2g4FKzfiPS2ztPTxQ7e3ryt1lorSwuWAwHvaMM80",
-  },
-  {
-    id: 5,
-    type: "image",
-    creator: "ava_thompson",
-    title: "Mythical Creatures Illustrated",
-    description: "A book of fantasy illustrations.",
-    image_url:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBJYalPNEV0Tu3DymsGNyhEQ5KQq19zxPmihIIaVsxhoV6aCY8eyP7Yoa4FKYOfYgBYBKQAUuDj49RomRnZA5Cjgiy4eD_xDslArnjvgrwC7Z50MJSmQZ6QHjvSTBSrh_vZsVammnKqRHPnXmy9m1NtNqCt-mR-88NkUAIFluUfwYW_fkSNlchhG5rxvbM1K8L-QzzyyU7iyge_40j1fjQSyZVXh8f9jK9zaLRkWBP5liiJBa4WcuLplP06iZJnpolcEZBRjcWtLms",
-  },
-  {
-    id: 6,
-    type: "audio",
-    creator: "caleb_foster",
-    title: "Future Cities Soundscape",
-    description: "Immersive sound design for film.",
-    image_url:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA4-ZBSlnNh3rlkjgipvu5_vkgdg6NvmW6RdxQYroftxSzp8tIRYu-ZtVf70yHFbd5ouf2AneTMS2vlKdClIdkJQF0xz32H9MNvgkOZuouJjrE1eM4ukmbFXPeGD0JF5ChbNV5rmZMv_75nQFP-xdsimFuD0CaRGN0PQjMxaNYSJnsOgfjD5DL4-eLU4REfX5NaS-FdJzpIdlQccYiajKFG3N2NPWxClAK54XV4AVU3_gXqQ2L3BaQky7B1pBY-epyn-ctTTmEQKBo",
-  },
-];
+// const sampleData: MediaItem[] = [
+//   {
+//     id: 1,
+//     type: "video",
+//     creator: "sophia_carter",
+//     title: "Cosmic Dreamscape: A Journey Through a Digital Universe",
+//     description: "A vibrant piece of digital art.",
+//     image_url:
+//       "https://lh3.googleusercontent.com/aida-public/AB6AXuAq0JsfLoE2N7rIUHLPFVVNaAupdnydUlTynOP9CFh6s3ur06ycYqWk56aVfZU1qF_crUYD2TUf4mM0RvSZ-vdFwbgW3RebxWHkpcoRN4r2a-yEny4lmtZ8uC3w-JfalPQh_HWY0Hr81Zp2dRn6O3K5fa2HGRq2_G_9AtuLrSjD5eZS9dBdNTnOguRb7os62MflrVtGHcxSelBZmskcDWW2TTQSC9d55CKboD1ouR6Bs59BpZ-uT9mcNkSyPm_GFGVogecQzgD9F0I",
+//   },
+//   {
+//     id: 2,
+//     type: "audio",
+//     creator: "ethan_bennet",
+//     title: "Synthwave Sonata",
+//     description: "An electrifying musical piece.",
+//     image_url:
+//       "https://lh3.googleusercontent.com/aida-public/AB6AXuCB_3gnrsFf1qeEmfOb4NEZCK8NUxxbE-b_NgSJrBjB41M8Y5oKrwUCoYmaIlCU4PfK_rWMlfGKABscMQ3x2aH-2Vekb2UD7KY1gyBWIqfMDOJ-6xNG4sSsUTHSEYKew5IFzTogkj7Zb_vTxA8ZQIZIlNlpFH_dKufrQ56_WSGz-3kbzHhZISC57NGds0M5iZhNG5EtvmBrmNoMPa45BPloBxc2qCHa-TenRbk5THHwIVFTF5ySoHi160mFJxfhwuruWSd6bvURYRc",
+//   },
+//   {
+//     id: 3,
+//     type: "image",
+//     creator: "olivia_hayes",
+//     title: "Urban Reflections",
+//     description: "A stunning series of photographs.",
+//     image_url:
+//       "https://lh3.googleusercontent.com/aida-public/AB6AXuCOS7_K_wMtn5d3O8n1BzLd-Cfaek6Wsmc2XurG9k7pFeo9woU2D0wTF7gghQXUqZd2R4CkqasscFAvgYI0fUby7wBYmnGw1OY1QNXRQtaBZxIGREi5TwXNnC7-uuRCuaWZL7W13rBA6RaKXjdER-7CCQ8skltJ0H-pU5m8ruW4vxENgaRIHWTmaeG7Vy1U-DtRVMUZEvkiZnmLX77UTqLN_u7vFB3sNlOd3A8LAmoZ9L-0bX1schQOUxw3gdnHykDMWdD3GvbP22E",
+//   },
+//   {
+//     id: 4,
+//     type: "video",
+//     creator: "noah_parker",
+//     title: "Cybernetic Sculptures",
+//     description: "A collection of futuristic 3D models.",
+//     image_url:
+//       "https://lh3.googleusercontent.com/aida-public/AB6AXuC5BQH1Haj_JI409mizi1F1R1JEislFOBtn0NoBFwdj6jcqSEuq_TL3focmiG6N-t4VIpNMSdP9HCxNqWGvjJzsrkRYzerc7cKKKInVFxr6iR8hRVRqaED7C-HY4iffev88LFVz_wgpf3n1B01lUAozfCxHtLR5vTlZrzf-Qm_oEGMS08-wfglu54vlbM4KO9pCpDzy1iDjomnBYb7Vxtq465Pcskf0R1wZ4He2g4FKzfiPS2ztPTxQ7e3ryt1lorSwuWAwHvaMM80",
+//   },
+//   {
+//     id: 5,
+//     type: "image",
+//     creator: "ava_thompson",
+//     title: "Mythical Creatures Illustrated",
+//     description: "A book of fantasy illustrations.",
+//     image_url:
+//       "https://lh3.googleusercontent.com/aida-public/AB6AXuBJYalPNEV0Tu3DymsGNyhEQ5KQq19zxPmihIIaVsxhoV6aCY8eyP7Yoa4FKYOfYgBYBKQAUuDj49RomRnZA5Cjgiy4eD_xDslArnjvgrwC7Z50MJSmQZ6QHjvSTBSrh_vZsVammnKqRHPnXmy9m1NtNqCt-mR-88NkUAIFluUfwYW_fkSNlchhG5rxvbM1K8L-QzzyyU7iyge_40j1fjQSyZVXh8f9jK9zaLRkWBP5liiJBa4WcuLplP06iZJnpolcEZBRjcWtLms",
+//   },
+//   {
+//     id: 6,
+//     type: "audio",
+//     creator: "caleb_foster",
+//     title: "Future Cities Soundscape",
+//     description: "Immersive sound design for film.",
+//     image_url:
+//       "https://lh3.googleusercontent.com/aida-public/AB6AXuA4-ZBSlnNh3rlkjgipvu5_vkgdg6NvmW6RdxQYroftxSzp8tIRYu-ZtVf70yHFbd5ouf2AneTMS2vlKdClIdkJQF0xz32H9MNvgkOZuouJjrE1eM4ukmbFXPeGD0JF5ChbNV5rmZMv_75nQFP-xdsimFuD0CaRGN0PQjMxaNYSJnsOgfjD5DL4-eLU4REfX5NaS-FdJzpIdlQccYiajKFG3N2NPWxClAK54XV4AVU3_gXqQ2L3BaQky7B1pBY-epyn-ctTTmEQKBo",
+//   },
+// ];
 
 export const NavButton = ({
   page,

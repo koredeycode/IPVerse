@@ -262,6 +262,11 @@ export default function Create() {
         description: errorDescription,
         duration: 5000,
       });
+      toast.error(errorMessage, {
+        description:
+          "You can click the origin button in the nav bar to check if your wallet is connected",
+        duration: 5000,
+      });
     } finally {
       setLoadingState("none");
     }
