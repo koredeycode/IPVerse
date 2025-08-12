@@ -155,7 +155,7 @@ const ContentPage = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <svg
-          className="animate-spin h-8 w-8 text-[var(--text-primary)]"
+          className="animate-spin h-8 w-8 text-ipv-primary"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -180,7 +180,7 @@ const ContentPage = () => {
 
   if (error || !id) {
     return (
-      <div className="flex items-center justify-center h-screen text-[var(--text-secondary)]">
+      <div className="flex items-center justify-center h-screen text-textSecondary">
         {error || "No content ID  provided"}
       </div>
     );
@@ -188,7 +188,7 @@ const ContentPage = () => {
 
   if (!contentData) {
     return (
-      <div className="flex items-center justify-center h-screen text-[var(--text-secondary)]">
+      <div className="flex items-center justify-center h-screen text-textSecondary">
         No content found
       </div>
     );

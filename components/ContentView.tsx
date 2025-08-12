@@ -121,13 +121,13 @@ const ContentView = ({
           )}
         </div>
         <div className="mb-6">
-          <h3 className="typography_h2 border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary">
+          <h3 className={`${typographyH2} border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary`}>
             Description
           </h3>
           <p className="pt-4">{description}</p>
         </div>
         <div className="mb-6">
-          <h3 className="typography_h2 border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary">
+          <h3 className={`${typographyH2} border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary`}>
             Metadata
           </h3>
           <div className="grid grid-cols-1 gap-y-4 pt-4 sm:grid-cols-2">
@@ -146,7 +146,7 @@ const ContentView = ({
           </div>
         </div>
         <div className="mb-6">
-          <h3 className="typography_h2 border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary">
+          <h3 className={`${typographyH2} border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary`}>
             Attributes
           </h3>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 pt-4">

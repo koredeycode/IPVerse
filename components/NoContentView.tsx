@@ -6,7 +6,12 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { buttonPrimary, typographyBody, typographyH2 } from "./styles";
+import {
+  buttonPrimary,
+  typographyBody,
+  typographyH1,
+  typographyH2,
+} from "./styles";
 
 interface MetadataAttribute {
   trait_type: string;
@@ -145,7 +150,7 @@ const NoContentView: React.FC<NoContentViewProps> = ({
       </div>
       <div className="card relative overflow-hidden">
         <div className="blur-md">
-          <h1 className="typography_h1 mb-2 text-textPrimary">{title}</h1>
+          <h1 className={`${typographyH1} mb-2 text-textPrimary`}>{title}</h1>
           <div className="relative mb-6 aspect-video w-full">
             <div
               className="h-full w-full rounded-xl bg-cover bg-center"
@@ -153,7 +158,9 @@ const NoContentView: React.FC<NoContentViewProps> = ({
             ></div>
           </div>
           <div className="mb-6">
-            <h3 className="typography_h2 border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary">
+            <h3
+              className={`${typographyH2} border-b border-[rgba(255,255,255,0.1)] pb-3 text-textPrimary`}
+            >
               Metadata
             </h3>
             <div className="grid grid-cols-1 gap-y-4 pt-4 sm:grid-cols-2">
