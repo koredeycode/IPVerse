@@ -53,7 +53,7 @@ const ContentItem = ({
     // </div>
     <article className="flex flex-col gap-3 group bg-cardBg rounded-lg">
       <Link href={`/content/${id}`}>
-        <div className="w-[256px] h-[320px] rounded-lg overflow-hidden relative self-center">
+        <div className="rounded-lg overflow-hidden relative self-center">
           <img
             src={imageUrl}
             alt={title}
