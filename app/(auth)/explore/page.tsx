@@ -1,5 +1,5 @@
 "use client";
-import ContentItem from "@/components/ContentItem";
+import ContentItem, { Content } from "@/components/ContentItem";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -14,12 +14,15 @@ const fileTypes = [
 const FilterButton = ({
   label,
   isActive = false,
+  onClick,
 }: {
   label: string;
   isActive: boolean;
+  onClick: () => void;
 }) => {
   return (
     <button
+      onClick={onClick}
       className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full ${
         isActive
           ? "bg-ipv-accent text-white"
@@ -113,38 +116,75 @@ export const NavButton = ({
 };
 
 const Explore = () => {
-  const [contents, setContents] = useState([]);
+  const [contents, setContents] = useState<Content[]>([]);
+  // const [filteredContents, setFilteredContents] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(["all"]);
+
+  const filteredContents = selectedTypes.includes("all")
+    ? contents
+    : contents.filter((item) => selectedTypes.includes(item.type));
+
   useEffect(() => {
     const loadContents = async () => {
       const response = await fetch("/api/contents");
       const data = await response.json();
 
       setContents(data ?? []);
+      // setFilteredContents(data ?? []);
     };
     loadContents();
   }, []);
+
+  const handleFilterClick = (value: string) => {
+    if (value === "all") {
+      // Selecting "All" resets filter
+      setSelectedTypes(["all"]);
+    } else {
+      setSelectedTypes((prev) => {
+        // Remove "all" if a specific type is chosen
+        const withoutAll = prev.filter((t) => t !== "all");
+
+        if (withoutAll.includes(value)) {
+          // If it's already selected, remove it
+          const newSelection = withoutAll.filter((t) => t !== value);
+          return newSelection.length === 0 ? ["all"] : newSelection;
+        } else {
+          // Add the new type
+          return [...withoutAll, value];
+        }
+      });
+    }
+  };
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-3 mb-6">
         {fileTypes.map(({ label, value }, idx) => (
-          <FilterButton key={idx} label={label} isActive={label == "All"} />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {contents.map(({ id, type, creator, title, description, imageUrl }) => (
-          <ContentItem
-            key={id}
-            id={id}
-            type={type}
-            creator={creator}
-            title={title}
-            description={description}
-            imageUrl={imageUrl}
+          <FilterButton
+            key={value}
+            label={label}
+            isActive={selectedTypes.includes(value)}
+            onClick={() => handleFilterClick(value)}
           />
         ))}
       </div>
-      <div className="flex items-center justify-center mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        {filteredContents.map(
+          ({ id, type, creator, title, description, imageUrl, createdAt }) => (
+            <ContentItem
+              key={id}
+              id={id}
+              type={type}
+              creator={creator}
+              title={title}
+              description={description}
+              imageUrl={imageUrl}
+              createdAt={createdAt}
+            />
+          )
+        )}
+      </div>
+      {/* <div className="flex items-center justify-center mt-8">
         <a
           className="flex size-10 items-center justify-center text-textSecondary hover:text-white transition-colors"
           href="#"
@@ -180,7 +220,7 @@ const Explore = () => {
             </svg>
           </div>
         </a>
-      </div>
+      </div> */}
     </>
   );
 };

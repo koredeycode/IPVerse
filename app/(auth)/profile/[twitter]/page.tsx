@@ -1,6 +1,7 @@
 // pages/ProfilePage.tsx
 "use client";
 import ContentItem, { Content } from "@/components/ContentItem";
+import { typographyBody } from "@/components/styles";
 import { getExpiryInfo } from "@/lib/content";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -25,7 +26,7 @@ function ProfileHeader({ title, bio, twitter }: ProfileHeaderProps) {
         <p className="profile_bio">{title}</p>
         {/* <p className="text-sm text-text-secondary">Joined in {joined}</p> */}
       </div>
-      <p className="max-w-xl mx-auto mt-4 typography_body">{bio}</p>
+      <p className={`max-w-xl mx-auto mt-4 ${typographyBody}`}>{bio}</p>
     </div>
   );
 }
@@ -38,18 +39,21 @@ type ContentsGridProps = {
 
 function ContentsGrid({ contents }: ContentsGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pt-4 ">
-      {contents.map(({ id, type, creator, title, description, imageUrl }) => (
-        <ContentItem
-          key={id}
-          id={id}
-          type={type}
-          creator={creator}
-          title={title}
-          description={description}
-          imageUrl={imageUrl}
-        />
-      ))}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-10">
+      {contents.map(
+        ({ id, type, creator, title, description, imageUrl, createdAt }) => (
+          <ContentItem
+            key={id}
+            id={id}
+            type={type}
+            creator={creator}
+            title={title}
+            description={description}
+            imageUrl={imageUrl}
+            createdAt={createdAt}
+          />
+        )
+      )}
     </div>
   );
 }
@@ -101,7 +105,7 @@ type SubscriptionListProps = {
 function SubscriptionList({ subscriptions }: SubscriptionListProps) {
   return (
     <div className="mt-10">
-      <h3 className="section_title">Active Subscriptions</h3>
+      {/* <h3 className="section_title">Active Subscriptions</h3> */}
       <div className="space-y-4 gap-4 flex">
         {subscriptions.map((sub, idx) => {
           const { expiresIn, expiryDate } = getExpiryInfo(
@@ -110,8 +114,8 @@ function SubscriptionList({ subscriptions }: SubscriptionListProps) {
           );
 
           return (
-            <Link href={`/content/${sub.contentId}`}>
-              <div key={idx} className="card flex items-center gap-4">
+            <Link key={idx} href={`/content/${sub.contentId}`}>
+              <div className="card flex items-center gap-4">
                 <div
                   className="w-16 h-16 rounded-full bg-cover bg-white bg-center"
                   style={{ backgroundImage: `url(/logo.png)` }}
@@ -148,13 +152,13 @@ async function fetchContents(twitter: string) {
   const response = await fetch(`/api/contents?creator=${twitter}`);
   const data = await response.json();
 
-  return Promise.resolve(data);
+  return Promise.resolve(data ?? []);
 }
 
 async function fetchSubscriptions(twitter: string) {
   const response = await fetch(`/api/subscriptions?subscriber=${twitter}`);
   const data = await response.json();
-  return Promise.resolve(data);
+  return Promise.resolve(data ?? []);
 }
 
 export default function ProfilePage() {

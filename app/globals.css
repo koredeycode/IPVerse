@@ -184,3 +184,10 @@
     @apply bg-ipv-background text-textPrimary;
   }
 }
+
+.two-line-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

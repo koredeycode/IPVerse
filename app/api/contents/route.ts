@@ -35,6 +35,8 @@ export async function GET(request: Request) {
   try {
     const queries = [Query.limit(100)];
     queries.push(Query.isNotNull("type"));
+    queries.push(Query.orderDesc("$createdAt"));
+
     const { searchParams } = new URL(request.url);
     // const type = searchParams.get("type");
     const creator = searchParams.get("creator");
@@ -61,6 +63,7 @@ export async function GET(request: Request) {
         description: doc.description,
         imageUrl: doc.imageUrl,
         type: doc.type,
+        createdAt: doc.$createdAt,
       }));
 
     return NextResponse.json(filtered);

@@ -3,7 +3,6 @@ import {
   databases,
   ID,
   subscriptionCollectionId,
-  userCollectionId,
 } from "@/lib/appwrite";
 import { NextResponse } from "next/server";
 import { Query } from "node-appwrite";
@@ -40,6 +39,7 @@ export async function GET(request: Request) {
     const subscriber = searchParams.get("subscriber");
     // const creator = searchParams.get("creator");
     const queries = [Query.limit(100)];
+    queries.push(Query.orderDesc("$createdAt"));
 
     if (subscriber) queries.push(Query.equal("subscriber", [subscriber]));
     // if (creator) queries.push(Query.equal("creator", creator));
