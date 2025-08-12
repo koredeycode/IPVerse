@@ -115,7 +115,9 @@ const ContentView = ({
               {error}
             </div>
           ) : (
-            <>{file && <ContentPreview file={file} />}</>
+            <div className="w-[1024px]">
+              {file && <ContentPreview file={file} />}
+            </div>
           )}
         </div>
         <div className="mb-6">
