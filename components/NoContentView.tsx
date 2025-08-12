@@ -63,7 +63,6 @@ const NoContentView: React.FC<NoContentViewProps> = ({
         return;
       }
       const data = await origin?.getTerms(tokenId);
-      console.log(data);
       setPrice(Number(data.price) / 10 ** 18);
       setDuration(fromTotalSeconds(data.duration));
     };

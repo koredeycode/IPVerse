@@ -81,8 +81,6 @@ export default function Create() {
 
     const { id } = await APIResponse.json();
 
-    console.log("new content id ", id);
-
     setContentId(id);
     setShowFileCard(true);
     setLoadingState("none");
@@ -130,7 +128,6 @@ export default function Create() {
       if (!imageUrl) {
         throw new Error("Failed to get IPFS URL after upload");
       }
-      console.log(imageUrl);
 
       toast.success("File uploaded to IPFS successfully!", {
         description: `IPFS URL: ${imageUrl}`,
@@ -221,7 +218,7 @@ export default function Create() {
 
     try {
       setLoadingState("minting");
-      console.log(mintFile, metadata, license);
+
       const tokenId = await origin.mintFile(mintFile, metadata, license);
 
       // 62969147512708210739597738314450365440119337125482253728267133656897450032217
@@ -431,23 +428,6 @@ export default function Create() {
                     }
                   />
                 </div>
-                {/* <div>
-                <label
-                  className="block text-sm font-medium text-text-primary mb-2"
-                  htmlFor="url"
-                >
-                  fileURL
-                </label>
-
-                <input
-                  className="input w-full bg-gray-700 cursor-not-allowed"
-                  id="url"
-                  placeholder="Auto-filled URL"
-                  type="text"
-                  value={mintData.fileUrl}
-                  readOnly
-                />
-              </div>*/}
                 <div className="md:col-span-2">
                   <label
                     className="block text-sm font-medium text-text-primary mb-2"
@@ -799,7 +779,7 @@ export default function Create() {
                     </svg>
                     <p className="mb-2 text-sm text-textSecondary">
                       <span className="font-semibold">Click to upload</span>
-                      {/* or drag and drop */}
+                      {/* TODO: or drag and drop */}
                     </p>
                     <p className="text-xs text-textSecondary">
                       Supported: JPG, PNG, GIF, MP4, MP3, etc.

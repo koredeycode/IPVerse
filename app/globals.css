@@ -191,3 +191,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+:root {
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+code,
+pre {
+  font-family: var(--font-geist-mono), monospace;
+}

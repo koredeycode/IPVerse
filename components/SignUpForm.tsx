@@ -36,7 +36,6 @@ const SignUpForm = ({ wallet }: { wallet: string }) => {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log("Form Data:", data);
     try {
       const { title, bio, twitter } = data;
       const response = await fetch("/api/users", {

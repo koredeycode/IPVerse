@@ -17,7 +17,9 @@ import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { parseEther } from "viem";
 import { useBalance } from "wagmi";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
@@ -36,7 +38,7 @@ export const ConnectedSocials = () => {
 
   const socials = data as SocialLinksStatus;
 
-  console.log("Social:", data);
+  // console.log("Social:", data);
 
   const {
     linkTwitter,
@@ -161,7 +163,6 @@ const Navbar = () => {
   const { logout } = usePrivy();
 
   const { wallet } = useActiveWallet();
-  console.log("Privy Wallet", wallet);
 
   const { openModal: openCampModal } = useModal();
 
@@ -171,6 +172,19 @@ const Navbar = () => {
   const { data: balance, isLoading: isLoadingBalance } = useBalance({
     address: wallet?.address as `0x${string}`,
   });
+
+  useEffect(() => {
+    if (!balance) return;
+    const hasEnoughCamp = balance ? balance.value > parseEther("0.01") : false;
+
+    if (!hasEnoughCamp && !isLoadingBalance) {
+      toast.error("Insufficient balance to mint a generation.", {
+        description:
+          "You need at least 0.01 $CAMP in your wallet to mint. Click faucet in the navbar to claim some test $CAMP",
+      });
+      return;
+    }
+  }, [balance]);
 
   const [search, setSearch] = useState("");
   const router = useRouter();
@@ -191,16 +205,6 @@ const Navbar = () => {
         <div className="flex justify-between items-center border-b border-solid border-white/10 py-2">
           {/*Logo*/}
           <div className="flex items-center gap-3">
-            {/* <div className="size-8 bg-yellow-100">
-            <svg
-              className="text-ipv-primary"
-              fill="currentColor"
-              viewBox="0 0 48 48"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"></path>
-            </svg>
-          </div> */}
             <Logo />
             {/* Navigation */}
             <nav className="flex gap-2">
@@ -275,11 +279,9 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* ✅ closes .flex.items-center gap-4 */}
             <div className="flex gap-4">
               <Popover>
                 <PopoverTrigger className="sm:flex items-center gap-2 cursor-pointer">
-                  {/* <button className="button_primary hidden sm:flex items-center gap-2"> */}
                   <span>{wallet ? truncate(wallet?.address) : "0x00..00"}</span>
                   <Image
                     width={8}
@@ -288,7 +290,6 @@ const Navbar = () => {
                     className="h-8 w-8 rounded-full"
                     src={`https://unavatar.io/x/${getLoggedInUserTwitter()}`}
                   />
-                  {/* </button> */}
                 </PopoverTrigger>
                 <PopoverContent className="bg-transparent outline-none border-none right-1">
                   <div className="absolute right-0 w-72 bg-cardBg text-textSecondary border border-[var(--input-border)] rounded-xl shadow-lg p-4">
@@ -348,34 +349,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-{
-  /* Search */
-}
-{
-  /* <label className="relative flex-1 flex items-center min-w-48 max-w-sm">
-          <div
-            className="absolute left-3 text-textSecondary"
-            data-icon="MagnifyingGlass"
-            data-size="20px"
-            data-weight="regular"
-          >
-            <svg
-              fill="currentColor"
-              height="20px"
-              viewBox="0 0 256 256"
-              width="20px"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
-            </svg>
-          </div>
-          <input
-            className="form-input w-full rounded-full border-none bg-cardBg h-10 placeholder:text-textSecondary pl-10 pr-4 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-ipv-primarytext-ipv-primary focus:ring-opacity-50"
-            placeholder="Search creators or IPs"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
-        </label> */
-}

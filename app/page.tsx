@@ -36,16 +36,18 @@ const Home = () => {
                 exclusive, subscription-based content.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
-                {/* <button
-                  className={`${buttonPrimary} px-8 py-3 text-lg font-semibold`}
-                  >
-                  Explore
-                  </button> */}
                 <Link href="/signin">
                   <button
                     className={`${buttonPrimary} px-8 py-3 text-lg font-semibold  cursor-pointer`}
                   >
                     Sign In
+                  </button>
+                </Link>
+                <Link href="/explore">
+                  <button
+                    className={`${buttonPrimary} px-8 py-3 text-lg font-semibold`}
+                  >
+                    Explore
                   </button>
                 </Link>
               </div>

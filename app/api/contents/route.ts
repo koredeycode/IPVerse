@@ -23,7 +23,6 @@ export async function POST(request: Request) {
     const { $id: id } = content;
     return NextResponse.json({ id });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { error: "Failed to create content" },
       { status: 500 }

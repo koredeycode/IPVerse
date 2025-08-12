@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { parseEther } from "viem";
 import { useBalance } from "wagmi";
-import { buttonPrimary } from "./styles";
 import Logo from "./Logo";
+import { buttonPrimary } from "./styles";
+import { useState } from "react";
 
 type ConnectSectionProps = {
   wallet: any;
@@ -30,6 +31,7 @@ export default function ConnectSection({
 }: ConnectSectionProps) {
   const auth = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data: balance, isLoading: isLoadingBalance } = useBalance({
     address: wallet?.address,
@@ -38,6 +40,7 @@ export default function ConnectSection({
   const hasEnoughCamp = balance ? balance.value > parseEther("0.01") : false;
 
   const handleClick = async () => {
+    setIsLoading(true);
     if (authenticated && privyAuthenticated && wallet) {
       const user = (await getUserInfo(wallet.address))[0];
 
@@ -95,6 +98,7 @@ export default function ConnectSection({
     } catch (error) {
       toast.error("An error occurred", { description: String(error) });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -114,15 +118,6 @@ export default function ConnectSection({
         <div className="p-8 text-center">
           {/* Icon */}
           <div className="flex justify-center mb-6">
-            {/* <div className="bg-accent/20 p-4 rounded-full">
-              <svg
-                className="h-12 w-12 text-ipv-accent"
-                fill="currentColor"
-                viewBox="0 0 48 48"
-              >
-                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"></path>
-              </svg>
-            </div> */}
             <Logo />
           </div>
 
@@ -149,6 +144,30 @@ export default function ConnectSection({
             onClick={handleClick}
             className={`${buttonPrimary} hover:bg-buttonHover text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold`}
           >
+            {isLoading && (
+              <span>
+                <svg
+                  className="animate-spin h-5 w-5 "
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </span>
+            )}
             {wallet?.address ? (
               authenticated ? (
                 <Image

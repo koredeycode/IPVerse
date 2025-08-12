@@ -44,7 +44,7 @@ const ContentPreview = ({ file }: ContentPreviewProps) => {
 
   if (ALLOWED_TEXT.includes(type)) {
     const isMarkdown = type === "text/markdown" || file.name.endsWith(".md");
-    // console.log(file);
+
     // if (isMarkdown) {
     //   return (
     //     <div className="relative flex flex-col">

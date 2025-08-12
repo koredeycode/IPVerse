@@ -87,7 +87,6 @@ const ContentPage = () => {
   const { wallet } = useActiveWallet();
   const address = wallet?.address as `0x${string}`;
 
-  console.log("the address", address);
   const [contentData, setContentData] = useState<ContentData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [access, setAccess] = useState<boolean>(false);
@@ -104,12 +103,12 @@ const ContentPage = () => {
         setIsLoading(true);
         setError(null);
         const tokenId = await getTokenId(id);
-        console.log("tokenId:", tokenId);
+
         setTokenId(tokenId);
         const owner = await origin?.ownerOf(tokenId);
-        console.log("owner", owner);
+
         const hasAccess = (await origin?.hasAccess(address, tokenId)) ?? false;
-        console.log("hasAccess:", hasAccess);
+
         if (hasAccess || owner === address) {
           setAccess(true);
           const tokenUri = await origin?.tokenURI(tokenId);
