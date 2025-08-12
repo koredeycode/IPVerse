@@ -55,7 +55,7 @@ export default function FileCard({
       <div className="flex-1 flex flex-col items-center justify-center px-4 text-center">
         {/* <div className="text-4xl mb-2">{fileTypeIcon}</div> */}
         <div className="text-7xl mb-6">📄</div>
-        <h2 className="font-semibold text-lg truncate max-w-[200px] text-black">
+        <h2 className="font-semibold text-sm truncate max-w-[200px] text-black">
           {title}
         </h2>
         <p className="text-xs text-gray-500 mt-1">By {creator}</p>
@@ -64,7 +64,7 @@ export default function FileCard({
       {/* QR Footer */}
       <div className="flex justify-between items-end gap-2 p-3 border-t border-gray-200 bg-gray-50">
         {/* Branding */}
-        <div className="flex items-center justify-center text-blue-500">
+        <div className="text-xs flex items-center justify-center text-blue-500">
           © Ipverse {new Date().getFullYear()}
         </div>
         {contentId && (

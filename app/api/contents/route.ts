@@ -52,15 +52,16 @@ export async function GET(request: Request) {
     );
 
     // Only send specific fields
-    const filtered = contents.documents.map((doc) => ({
-      id: doc.$id,
-      title: doc.title,
-      description: doc.description,
-      creator: doc.creator,
-      imageUrl: doc.imageUrl,
-      type: doc.type,
-      // add any other fields you want
-    }));
+    const filtered = contents.documents
+      .filter((doc) => doc.fileUrl)
+      .map((doc) => ({
+        id: doc.$id,
+        title: doc.title,
+        creator: doc.creator,
+        description: doc.description,
+        imageUrl: doc.imageUrl,
+        type: doc.type,
+      }));
 
     return NextResponse.json(filtered);
   } catch (error) {

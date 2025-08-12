@@ -39,7 +39,7 @@ type Content = {
   // href: string;
 };
 
-const GalleryItem = ({
+const ContentItem = ({
   id,
   title,
   creator,
@@ -73,14 +73,15 @@ const GalleryItem = ({
       <div className="p-4">
         <h3 className="font-semibold truncate">{title}</h3>
         <div className="flex justify-between">
-          <p className="text-textSecondary text-sm">by @{creator}</p>
+          <Link href={`/profile/${creator}`}>
+            <p className="text-textSecondary text-sm">by @{creator}</p>
+          </Link>
           <p className="text-textSecondary text-sm">{type}</p>
         </div>
       </div>
     </div>
   );
 };
-
 // components/ContentsGrid.tsx
 
 type ContentsGridProps = {
@@ -91,7 +92,7 @@ function ContentsGrid({ contents }: ContentsGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pt-4 ">
       {contents.map(({ id, type, creator, title, description, imageUrl }) => (
-        <GalleryItem
+        <ContentItem
           key={id}
           id={id}
           type={type}
