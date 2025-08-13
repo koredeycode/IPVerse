@@ -5,6 +5,7 @@ import "./globals.css";
 import { CampModal } from "@campnetwork/origin/react";
 import { Toaster } from "sonner";
 import Providers from "./providers";
+import { Suspense } from "react";
 // import { Head } from "next/document";
 
 const geistSans = Geist({
@@ -32,11 +33,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <CampModal injectButton={false} />
-          {children}
-        </Providers>
-        <Toaster theme="dark" />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Providers>
+            <CampModal injectButton={false} />
+            {children}
+          </Providers>
+          <Toaster theme="dark" />
+        </Suspense>
       </body>
     </html>
   );
