@@ -5,7 +5,7 @@ import { useAuth, useAuthState, useConnect } from "@campnetwork/origin/react";
 import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -85,7 +85,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       {/* <Sidebar /> */}
       <div className="flex-1">
         <Navbar />
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <Suspense fallback={<div>Loading...</div>}>
+          <main className="flex-1 p-4 md:p-8">{children}</main>
+        </Suspense>
       </div>
     </div>
   );
