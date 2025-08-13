@@ -4,13 +4,13 @@ import { getUserInfo } from "@/lib/utils";
 import { useAuth } from "@campnetwork/origin/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { parseEther } from "viem";
 import { useBalance } from "wagmi";
 import Logo from "./Logo";
 import { buttonPrimary } from "./styles";
-import { useState } from "react";
 
 type ConnectSectionProps = {
   wallet: any;
@@ -38,6 +38,8 @@ export default function ConnectSection({
   });
 
   const hasEnoughCamp = balance ? balance.value > parseEther("0.01") : false;
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const handleClick = async () => {
     setIsLoading(true);
@@ -46,7 +48,7 @@ export default function ConnectSection({
 
       if (user) {
         localStorage.setItem("IPVERSE_USER", JSON.stringify(user));
-        router.push("/explore");
+        router.push(redirect || "/explore");
         return;
       } else {
         router.push("/signup");

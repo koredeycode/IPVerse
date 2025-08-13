@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { useAuth, useAuthState, useConnect } from "@campnetwork/origin/react";
 import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
 interface AuthLayoutProps {
@@ -19,6 +19,16 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
   const { authenticated: privyAuthenticated, ready } = usePrivy();
   const router = useRouter();
+  const pathname = usePathname(); // e.g. "/content/123"
+  const searchParams = useSearchParams(); // URLSearchParams object
+  const query = searchParams.toString();
+  console.log(pathname, query);
+
+  const pathAndQuery = query ? `${pathname}?${query}` : pathname;
+
+  const redirectUrl = pathAndQuery
+    ? `/signin?redirect=${pathAndQuery}`
+    : "/signin";
 
   // Log auth state for debugging
   console.log({ loading, authenticated, privyAuthenticated, ready });
@@ -57,7 +67,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="min-h-screen bg-ipv-background flex flex-col items-center justify-center">
         <p className="text-xl text-textPrimary mb-4">You are not logged in</p>
         <Link
-          href="/signin"
+          href={redirectUrl}
           className="bg-ipv-primary text-white px-6 py-2 rounded"
         >
           Go to Sign In

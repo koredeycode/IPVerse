@@ -75,7 +75,7 @@ const ContentPreview = ({ file }: ContentPreviewProps) => {
 
     return (
       <div>
-        <pre className="bg-gray-100 text-black p-4 rounded max-h-80 overflow-auto text-sm">
+        <pre className="bg-gray-100 text-black p-4 rounded text-wrap text-sm">
           {content}
         </pre>
       </div>
@@ -92,7 +92,7 @@ const ContentPreview = ({ file }: ContentPreviewProps) => {
 
   if (ALLOWED_VIDEO.includes(type)) {
     return (
-      <video controls className="w-full rounded">
+      <video controls className="rounded">
         <source src={URL.createObjectURL(file)} type={type} />
       </video>
     );
